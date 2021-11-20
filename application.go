@@ -4,9 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net"
 	"net/http"
+	"strconv"
 	"time"
 
+	"github.com/function61/holepunch-server/pkg/wsconnadapter"
+	"github.com/gorilla/websocket"
 	"github.com/pkg/errors"
 )
 
@@ -27,6 +31,96 @@ func (api *API) CreateApplication(ctx context.Context, namespace string, applica
 	}
 
 	return &result, nil
+}
+
+func (api *API) ListApplications(ctx context.Context, namespace string) ([]*Application, error) {
+	if namespace == "" {
+		return nil, fmt.Errorf("namespace not selected")
+	}
+
+	resp, err := api.makeRequestContext(ctx, http.MethodGet, getURL(api.BaseURL, projectsURL, api.ProjectID, namespacesURL, namespace, applicationsURL), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var applications []*Application
+	err = json.Unmarshal(resp, &applications)
+	if err != nil {
+		return nil, errors.Wrap(err, errUnmarshalError)
+	}
+
+	return applications, nil
+}
+
+func (api *API) UpdateApplication(ctx context.Context, namespace string, p Application) (*Application, error) {
+	if namespace == "" {
+		return nil, fmt.Errorf("namespace not selected")
+	}
+
+	resp, err := api.makeRequestContext(ctx, http.MethodPatch, getURL(api.BaseURL, projectsURL, api.ProjectID, namespacesURL, namespace, applicationsURL, p.Name), p)
+	if err != nil {
+		return nil, err
+	}
+
+	var result Application
+	err = json.Unmarshal(resp, &result)
+	if err != nil {
+		return nil, errors.Wrap(err, errUnmarshalError)
+	}
+
+	return &result, nil
+}
+
+func (api *API) GetApplication(ctx context.Context, namespace, name string) (*Application, error) {
+	if namespace == "" {
+		return nil, fmt.Errorf("namespace not selected")
+	}
+
+	resp, err := api.makeRequestContext(ctx, http.MethodGet, getURL(api.BaseURL, projectsURL, api.ProjectID, namespacesURL, namespace, applicationsURL, name), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var result Application
+	err = json.Unmarshal(resp, &result)
+	if err != nil {
+		return nil, errors.Wrap(err, errUnmarshalError)
+	}
+
+	return &result, nil
+}
+
+type LogsOpts struct {
+	Container string
+	Device    string
+	Follow    bool
+	Tail      int
+}
+
+func (api *API) DeviceApplicationLogs(ctx context.Context, namespace, applicationID string, opts LogsOpts) (net.Conn, error) {
+	if namespace == "" {
+		return nil, fmt.Errorf("namespace not selected")
+	}
+
+	u := getWebsocketURL(api.BaseURL, projectsURL, api.ProjectID, namespacesURL, namespace, applicationsURL, applicationID, logsURL, opts.Container)
+	req, err := http.NewRequestWithContext(ctx, "", u, nil)
+	if err != nil {
+		return nil, err
+	}
+	q := req.URL.Query()
+	q.Add("device", opts.Device)
+	q.Add("follow", strconv.FormatBool(opts.Follow))
+	q.Add("tail", strconv.Itoa(opts.Tail))
+
+	req.URL.RawQuery = q.Encode()
+	req.SetBasicAuth(api.APIAccessKey, "")
+
+	wsConn, _, err := websocket.DefaultDialer.Dial(req.URL.String(), req.Header)
+	if err != nil {
+		return nil, err
+	}
+
+	return wsconnadapter.New(wsConn), nil
 }
 
 type Application struct {

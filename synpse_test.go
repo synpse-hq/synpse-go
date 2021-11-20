@@ -13,17 +13,22 @@ const (
 
 	EnvSynpseSDKTestProjectName = "SYNPSE_SDK_TEST_PROJECT_NAME"
 	EnvSynpseSDKTestProjectID   = "SYNPSE_SDK_TEST_PROJECT_ID"
+
+	EnvSynpseSDKTestApplicationName = "SYNPSE_SDK_TEST_APPLICATION_NAME"
 )
 
 // Testing data
 var (
-	sdkTestProjectName string
-	sdkTestProjectID   string
+	sdkTestProjectName     string
+	sdkTestProjectID       string
+	sdkTestApplicationName string
+	sdkTestNamespace       = "default"
 )
 
 func init() {
 	sdkTestProjectName = os.Getenv(EnvSynpseSDKTestProjectName)
 	sdkTestProjectID = os.Getenv(EnvSynpseSDKTestProjectID)
+	sdkTestApplicationName = os.Getenv(EnvSynpseSDKTestApplicationName)
 }
 
 // getTestingClient returns a new API client for testing purposes. This
