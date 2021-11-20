@@ -1,24 +1,49 @@
 package synpse
 
-import "time"
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"time"
+
+	"github.com/pkg/errors"
+)
+
+func (api *API) CreateApplication(ctx context.Context, namespace string, application Application) (*Application, error) {
+	if namespace == "" {
+		return nil, fmt.Errorf("namespace not selected")
+	}
+
+	resp, err := api.makeRequestContext(ctx, http.MethodPost, getURL(api.BaseURL, projectsURL, api.ProjectID, namespacesURL, namespace, applicationsURL), application)
+	if err != nil {
+		return nil, err
+	}
+
+	var result Application
+	err = json.Unmarshal(resp, &result)
+	if err != nil {
+		return nil, errors.Wrap(err, errUnmarshalError)
+	}
+
+	return &result, nil
+}
 
 type Application struct {
-	ID string `json:"id" yaml:"id" gorm:"primaryKey"`
-	// Version is used to check application updated
-	Version       int64       `json:"version" yaml:"version"`
+	ID            string      `json:"id" yaml:"id"`
+	Version       int64       `json:"version" yaml:"version"`             // Version is used to check application updated
 	ConfigVersion int64       `json:"configVersion" yaml:"configVersion"` // config version is used on agent side only to indicate that the config has changed and application object needs to be redeployed.
 	CreatedAt     time.Time   `json:"createdAt" yaml:"createdAt"`
 	UpdatedAt     time.Time   `json:"updatedAt" yaml:"updatedAt"`
-	ProjectID     string      `json:"projectId" yaml:"projectId" gorm:"index"`
-	NamespaceID   string      `json:"namespaceId" yaml:"namespaceId" gorm:"index"`
+	ProjectID     string      `json:"projectId" yaml:"projectId"`
+	NamespaceID   string      `json:"namespaceId" yaml:"namespaceId"`
 	Name          string      `json:"name" yaml:"name"`
 	Description   string      `json:"description,omitempty" yaml:"description,omitempty"`
 	Type          RuntimeType `json:"type" yaml:"type"`
 	Scheduling    Scheduling  `json:"scheduling" yaml:"scheduling"`
 
-	Spec ApplicationSpec `json:"spec" yaml:"spec" validate:"dive" gorm:"json"`
-	// Statuses         []ApplicationStatus         `json:"statuses,omitempty" yaml:"status,omitempty" gorm:"-"`                   // stored separately.
-	DeploymentStatus ApplicationDeploymentStatus `json:"deploymentStatus,omitempty" yaml:"deploymentStatus,omitempty" gorm:"-"` // computed
+	Spec             ApplicationSpec             `json:"spec" yaml:"spec"`
+	DeploymentStatus ApplicationDeploymentStatus `json:"deploymentStatus,omitempty" yaml:"deploymentStatus,omitempty"` // computed
 }
 
 type Scheduling struct {
