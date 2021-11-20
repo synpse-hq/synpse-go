@@ -16,8 +16,8 @@ func WithHTTPClient(client *http.Client) Option {
 	}
 }
 
-// WithAPIEndpointURL overrides default Webhook Relay API server address.
-// Default: "https://my.webhookrelay.com/v1"
+// WithAPIEndpointURL overrides default Synpse API address.
+// Default: "https://cloud.synpse.net/api"
 func WithAPIEndpointURL(apiBaseURL string) Option {
 	return func(api *API) error {
 		api.BaseURL = apiBaseURL

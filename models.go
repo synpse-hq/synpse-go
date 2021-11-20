@@ -122,29 +122,28 @@ type ApplicationSpec struct {
 
 type ContainerSpec struct {
 	// Container runtime
-	Name             string            `json:"name,omitempty" yaml:"name,omitempty" codec:"name" validate:"name"`
-	Image            string            `json:"image,omitempty" yaml:"image,omitempty" codec:"image"`
-	Args             []string          `json:"args,omitempty" yaml:"args,omitempty" codec:"args"`
-	Auth             *DockerAuth       `json:"auth,omitempty" yaml:"auth,omitempty" codec:"auth"`
-	CapAdd           []string          `json:"capAdd,omitempty" yaml:"capAdd,omitempty" codec:"cap_add"`
-	CapDrop          []string          `json:"capDrop,omitempty" yaml:"capDrop,omitempty" codec:"cap_drop"`
-	Command          string            `json:"command,omitempty" yaml:"command,omitempty" codec:"command"`
-	GPUs             string            `json:"gpus,omitempty" yaml:"gpus,omitempty" codec:"gpus"` // Shortcut flag for the GPUs, to enable all gpus, specify 'all'
-	Entrypoint       []string          `json:"entrypoint,omitempty" yaml:"entrypoint,omitempty" codec:"entrypoint"`
-	ForcePull        bool              `json:"forcePull,omitempty" yaml:"forcePull,omitempty" codec:"force_pull"`
-	Hostname         string            `json:"hostname,omitempty" yaml:"hostname,omitempty" codec:"hostname"`
-	MemoryHardLimit  int64             `json:"memoryHardLimit,omitempty" yaml:"memoryHardLimit,omitempty" codec:"memory_hard_limit"`
-	User             string            `json:"user,omitempty" yaml:"user,omitempty" codec:"user"`
-	NetworkMode      NetworkMode       `json:"networkMode,omitempty" yaml:"networkMode,omitempty" codec:"network_mode"`
-	Ports            []string          `json:"ports,omitempty" yaml:"ports,omitempty" codec:"ports"` // Ports to expose like 8080:800
-	Privileged       bool              `json:"privileged,omitempty" yaml:"privileged,omitempty" codec:"privileged"`
-	ImagePullTimeout string            `json:"imagePullTimeout,omitempty" yaml:"imagePullTimeout,omitempty" codec:"image_pull_timeout"`
-	SecurityOpt      []string          `json:"securityOpt,omitempty" yaml:"securityOpt,omitempty" codec:"security_opt"`
-	ShmSize          int64             `json:"shmSize,omitempty" yaml:"shmSize,omitempty" codec:"shm_size"`
-	StorageOpt       map[string]string `json:"storageOpt,omitempty" yaml:"storageOpt,omitempty" codec:"storage_opt"`
-	Volumes          []string          `json:"volumes,omitempty" yaml:"volumes,omitempty" codec:"volumes"`
-	VolumeDriver     string            `json:"volumeDriver,omitempty" yaml:"volumeDriver,omitempty" codec:"volume_driver"`
-	WorkDir          string            `json:"workDir,omitempty" yaml:"workDir,omitempty" codec:"work_dir"`
+	Name             string      `json:"name,omitempty" yaml:"name,omitempty" codec:"name" validate:"name"`
+	Image            string      `json:"image,omitempty" yaml:"image,omitempty" codec:"image"`
+	Args             []string    `json:"args,omitempty" yaml:"args,omitempty" codec:"args"`
+	Auth             *DockerAuth `json:"auth,omitempty" yaml:"auth,omitempty" codec:"auth"`
+	CapAdd           []string    `json:"capAdd,omitempty" yaml:"capAdd,omitempty" codec:"cap_add"`
+	CapDrop          []string    `json:"capDrop,omitempty" yaml:"capDrop,omitempty" codec:"cap_drop"`
+	Command          string      `json:"command,omitempty" yaml:"command,omitempty" codec:"command"`
+	GPUs             string      `json:"gpus,omitempty" yaml:"gpus,omitempty" codec:"gpus"` // Shortcut flag for the GPUs, to enable all gpus, specify 'all'
+	Entrypoint       []string    `json:"entrypoint,omitempty" yaml:"entrypoint,omitempty" codec:"entrypoint"`
+	ForcePull        bool        `json:"forcePull,omitempty" yaml:"forcePull,omitempty" codec:"force_pull"`
+	Hostname         string      `json:"hostname,omitempty" yaml:"hostname,omitempty" codec:"hostname"`
+	MemoryHardLimit  int64       `json:"memoryHardLimit,omitempty" yaml:"memoryHardLimit,omitempty" codec:"memory_hard_limit"`
+	User             string      `json:"user,omitempty" yaml:"user,omitempty" codec:"user"`
+	NetworkMode      NetworkMode `json:"networkMode,omitempty" yaml:"networkMode,omitempty" codec:"network_mode"`
+	Ports            []string    `json:"ports,omitempty" yaml:"ports,omitempty" codec:"ports"` // Ports to expose like 8080:800
+	Privileged       bool        `json:"privileged,omitempty" yaml:"privileged,omitempty" codec:"privileged"`
+	ImagePullTimeout string      `json:"imagePullTimeout,omitempty" yaml:"imagePullTimeout,omitempty" codec:"image_pull_timeout"`
+	SecurityOpt      []string    `json:"securityOpt,omitempty" yaml:"securityOpt,omitempty" codec:"security_opt"`
+	ShmSize          int64       `json:"shmSize,omitempty" yaml:"shmSize,omitempty" codec:"shm_size"`
+	Volumes          []string    `json:"volumes,omitempty" yaml:"volumes,omitempty" codec:"volumes"`
+	VolumeDriver     string      `json:"volumeDriver,omitempty" yaml:"volumeDriver,omitempty" codec:"volume_driver"`
+	WorkDir          string      `json:"workDir,omitempty" yaml:"workDir,omitempty" codec:"work_dir"`
 
 	// synpse specific
 	Environment   Environments  `json:"env,omitempty" yaml:"env,omitempty" validate:"dive"`

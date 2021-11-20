@@ -70,7 +70,7 @@ const (
 )
 
 // New creates a new Synpse v1 API client.
-func New(accessKey string, opts ...Option) (*API, error) {
+func New(accessKey, projectID string, opts ...Option) (*API, error) {
 	if accessKey == "" {
 		return nil, ErrEmptyCredentials
 	}
@@ -81,6 +81,7 @@ func New(accessKey string, opts ...Option) (*API, error) {
 	}
 
 	api.APIAccessKey = accessKey
+	api.ProjectID = projectID
 
 	return api, nil
 }
@@ -91,6 +92,7 @@ type API struct {
 	APIAccessKey string
 	BaseURL      string
 	UserAgent    string
+	ProjectID    string
 
 	authType    int
 	httpClient  *http.Client
@@ -148,10 +150,6 @@ type Logger interface {
 
 // makeRequest makes a HTTP request and returns the body as a byte slice,
 // closing it before returning. params will be serialized to JSON.
-func (api *API) makeRequest(method, uri string, params interface{}) ([]byte, error) {
-	return api.makeRequestWithAuthType(context.TODO(), method, uri, params, api.authType)
-}
-
 func (api *API) makeRequestContext(ctx context.Context, method, uri string, params interface{}) ([]byte, error) {
 	return api.makeRequestWithAuthType(ctx, method, uri, params, api.authType)
 }
@@ -178,10 +176,13 @@ func (api *API) makeRequestWithAuthTypeAndHeaders(ctx context.Context, method, u
 		jsonBody = nil
 	}
 
-	var resp *http.Response
-	var respErr error
-	var reqBody io.Reader
-	var respBody []byte
+	var (
+		resp     *http.Response
+		respErr  error
+		reqBody  io.Reader
+		respBody []byte
+	)
+
 	for i := 0; i <= api.retryPolicy.MaxRetries; i++ {
 		if jsonBody != nil {
 			reqBody = bytes.NewReader(jsonBody)
@@ -204,6 +205,7 @@ func (api *API) makeRequestWithAuthTypeAndHeaders(ctx context.Context, method, u
 		if err != nil {
 			return nil, errors.Wrap(err, "Error caused by request rate limiting")
 		}
+		fmt.Println("URL: ", uri)
 		resp, respErr = api.request(ctx, method, uri, reqBody, authType, headers)
 
 		// retry if the server is rate limiting us or if it failed
@@ -270,11 +272,10 @@ func (api *API) makeRequestWithAuthTypeAndHeaders(ctx context.Context, method, u
 // *http.Response, or an error if one occurred. The caller is responsible for
 // closing the response body.
 func (api *API) request(ctx context.Context, method, uri string, reqBody io.Reader, authType int, headers http.Header) (*http.Response, error) {
-	req, err := http.NewRequest(method, api.BaseURL+uri, reqBody)
+	req, err := http.NewRequestWithContext(ctx, method, uri, reqBody)
 	if err != nil {
 		return nil, errors.Wrap(err, "HTTP request creation failed")
 	}
-	req.WithContext(ctx)
 
 	combinedHeaders := make(http.Header)
 	copyHeader(combinedHeaders, api.headers)
@@ -309,8 +310,8 @@ func copyHeader(target, source http.Header) {
 	}
 }
 
-func getWebsocketURL(u *url.URL, s ...string) string {
-	uCopy, _ := url.Parse(u.String())
+func getWebsocketURL(u string, s ...string) string {
+	uCopy, _ := url.Parse(u)
 	switch uCopy.Scheme {
 	case "http":
 		uCopy.Scheme = "ws"
