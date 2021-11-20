@@ -10,8 +10,8 @@ steps:
   - name: test-unit
     image: quay.io/synpse/golang:1.16
     environment:
-      SYNPSE_SDK_TEST_PROJECT_NAME: synpse-sdk-test-project
-      SYNPSE_SDK_TEST_PROJECT_ID: prj_21BO1T8hxoZoozKWgLEvphVBgXk
+      SYNPSE_SDK_TEST_PROJECT_NAME: synpse-go-sdk-test
+      SYNPSE_SDK_TEST_PROJECT_ID: prj_21Cgc1teRUxGkvyYIxp4IQbsbe0
       SYNPSE_SDK_TEST_APPLICATION_NAME: sdk-testing-app
       SYNPSE_PROJECT_ACCESS_KEY:
         from_secret: projectAccessKey
