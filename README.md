@@ -21,6 +21,8 @@
 
 ## Synpse v1 API client
 
+[![Build Status](https://drone-kr.webrelay.io/api/badges/synpse-hq/synpse-go/status.svg)](https://drone-kr.webrelay.io/synpse-hq/synpse-go)
+
 Synpse provides your device fleet management, application deployment and their configuration. Whole process is simple with very low learning curve.
 
 ## Prerequisites
