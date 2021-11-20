@@ -17,3 +17,5 @@ steps:
         from_secret: projectAccessKey
       SYNPSE_PERSONAL_ACCESS_KEY:
         from_secret: personalAccessKey
+    commands:
+      - go test -v ./...
