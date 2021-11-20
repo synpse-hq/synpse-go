@@ -37,7 +37,7 @@ func getTestingProjectClient(t *testing.T) *API {
 	accessKey := os.Getenv(EnvSynpseProjectAccessKey)
 	projectID := os.Getenv(EnvSynpseSDKTestProjectID)
 
-	apiClient, err := New(accessKey, projectID)
+	apiClient, err := NewWithProject(accessKey, projectID)
 	require.NoError(t, err, "failed to create API client")
 
 	return apiClient
@@ -49,7 +49,7 @@ func getTestingPersonalClient(t *testing.T) *API {
 	accessKey := os.Getenv(EnvSynpsePersonalAccessKey)
 	projectID := os.Getenv(EnvSynpseSDKTestProjectID)
 
-	apiClient, err := New(accessKey, projectID)
+	apiClient, err := NewWithProject(accessKey, projectID)
 	require.NoError(t, err, "failed to create API client")
 
 	return apiClient

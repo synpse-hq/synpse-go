@@ -1,3 +1,4 @@
+// Package synpse implements the Synpse v1 API.
 package synpse
 
 import (
@@ -70,7 +71,23 @@ const (
 )
 
 // New creates a new Synpse v1 API client.
-func New(accessKey, projectID string, opts ...Option) (*API, error) {
+func New(accessKey string, opts ...Option) (*API, error) {
+	if accessKey == "" {
+		return nil, ErrEmptyCredentials
+	}
+
+	api, err := newClient(opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	api.APIAccessKey = accessKey
+
+	return api, nil
+}
+
+// NewWithProject creates a new Synpse v1 API client with a preconfigured project.
+func NewWithProject(accessKey, projectID string, opts ...Option) (*API, error) {
 	if accessKey == "" {
 		return nil, ErrEmptyCredentials
 	}

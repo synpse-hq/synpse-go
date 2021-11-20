@@ -14,6 +14,8 @@ import (
 	"github.com/pkg/errors"
 )
 
+// CreateApplication creates a new application in the specified namespace.
+// Applications documentation can be found here: https://docs.synpse.net/synpse-core/applications
 func (api *API) CreateApplication(ctx context.Context, namespace string, application Application) (*Application, error) {
 	if namespace == "" {
 		return nil, fmt.Errorf("namespace not selected")
@@ -65,6 +67,8 @@ func (api *API) ListApplications(ctx context.Context, namespace string) ([]*Appl
 	return applications, nil
 }
 
+// UpdateApplication updates application. This will trigger a version bump on the server side which will redeploy application on
+// all devices that the application is scheduled on.
 func (api *API) UpdateApplication(ctx context.Context, namespace string, p Application) (*Application, error) {
 	if namespace == "" {
 		return nil, fmt.Errorf("namespace not selected")
@@ -84,6 +88,7 @@ func (api *API) UpdateApplication(ctx context.Context, namespace string, p Appli
 	return &result, nil
 }
 
+// GetApplication gets application by name.
 func (api *API) GetApplication(ctx context.Context, namespace, name string) (*Application, error) {
 	if namespace == "" {
 		return nil, fmt.Errorf("namespace not selected")
@@ -103,6 +108,7 @@ func (api *API) GetApplication(ctx context.Context, namespace, name string) (*Ap
 	return &result, nil
 }
 
+// LogsOpts is the structure that needs to be passed when getting application logs from the device.
 type LogsOpts struct {
 	Container string
 	Device    string
@@ -136,6 +142,7 @@ func (api *API) DeviceApplicationLogs(ctx context.Context, namespace, applicatio
 	return wsconnadapter.New(wsConn), nil
 }
 
+// Application is
 type Application struct {
 	ID            string      `json:"id" yaml:"id"`
 	Version       int64       `json:"version" yaml:"version"`             // Version is used to check application updated
