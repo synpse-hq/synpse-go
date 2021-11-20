@@ -8,13 +8,41 @@ import (
 )
 
 const (
-	EnvSynpseAccessKey = "SYNPSE_ACCESS_KEY"
-	EnvSynpseProjectID = "SYNPSE_PROJECT_ID"
+	EnvSynpsePersonalAccessKey = "SYNPSE_PERSONAL_ACCESS_KEY"
+	EnvSynpseProjectAccessKey  = "SYNPSE_PROJECT_ACCESS_KEY"
+
+	EnvSynpseSDKTestProjectName = "SYNPSE_SDK_TEST_PROJECT_NAME"
+	EnvSynpseSDKTestProjectID   = "SYNPSE_SDK_TEST_PROJECT_ID"
 )
 
-func getTestingClient(t *testing.T) *API {
-	accessKey := os.Getenv(EnvSynpseAccessKey)
-	projectID := os.Getenv(EnvSynpseProjectID)
+// Testing data
+var (
+	sdkTestProjectName string
+	sdkTestProjectID   string
+)
+
+func init() {
+	sdkTestProjectName = os.Getenv(EnvSynpseSDKTestProjectName)
+	sdkTestProjectID = os.Getenv(EnvSynpseSDKTestProjectID)
+}
+
+// getTestingClient returns a new API client for testing purposes. This
+// client should be using project access keys.
+func getTestingProjectClient(t *testing.T) *API {
+	accessKey := os.Getenv(EnvSynpseProjectAccessKey)
+	projectID := os.Getenv(EnvSynpseSDKTestProjectID)
+
+	apiClient, err := New(accessKey, projectID)
+	require.NoError(t, err, "failed to create API client")
+
+	return apiClient
+}
+
+// getTestingPersonalClient returns a new API client for testing purposes. This
+// client should be using personal access keys.
+func getTestingPersonalClient(t *testing.T) *API {
+	accessKey := os.Getenv(EnvSynpsePersonalAccessKey)
+	projectID := os.Getenv(EnvSynpseSDKTestProjectID)
 
 	apiClient, err := New(accessKey, projectID)
 	require.NoError(t, err, "failed to create API client")

@@ -9,7 +9,7 @@ import (
 )
 
 func TestListDevices(t *testing.T) {
-	client := getTestingClient(t)
+	client := getTestingProjectClient(t)
 
 	devices, err := client.ListDevices(context.Background(), []string{})
 	require.NoError(t, err)
