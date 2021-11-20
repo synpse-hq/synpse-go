@@ -11,7 +11,9 @@ import (
 	"github.com/pkg/errors"
 )
 
-// CreateSecret creates a secret in a specified namespace.
+// CreateSecret creates a secret in a specified namespace. Secret data will be encoded to base64
+// before sending to the API.
+//
 // Secrets API ref: https://docs.synpse.net/synpse-core/applications/secrets
 func (api *API) CreateSecret(ctx context.Context, namespace string, secret Secret) (*Secret, error) {
 	if namespace == "" {
@@ -37,8 +39,8 @@ func (api *API) CreateSecret(ctx context.Context, namespace string, secret Secre
 	return &result, nil
 }
 
+// ensureSecretEncoding checks whether payload is already base64 encoded. If not, encodes it.
 func (api *API) ensureSecretEncoding(secret *Secret) error {
-	// Checking if string is encoded
 	_, err := base64.StdEncoding.DecodeString(secret.Data)
 	if err == nil {
 		// Already encoded, nothing to do
@@ -118,6 +120,7 @@ func (api *API) UpdateSecret(ctx context.Context, namespace string, p Secret) (*
 	return &result, nil
 }
 
+// GetSecret gets the secret. Client automatically attempts base64 decoding the secret data.
 func (api *API) GetSecret(ctx context.Context, namespace, name string) (*Secret, error) {
 	if namespace == "" {
 		return nil, ErrNamespaceNotSpecified
