@@ -22,3 +22,20 @@
 ## Synpse v1 API client
 
 Synpse provides your device fleet management, application deployment and their configuration. Whole process is simple with very low learning curve.
+
+## Prerequisites
+
+- [Go](https://golang.org/dl/)
+- [Synpse account](https://cloud.synpse.net/) - free up to 5 devices.
+
+## Installation
+
+```shell
+go get github.com/synpse-hq/synpse-go
+```
+
+## Authentication
+
+To authenticate, we recommend using a project level access key that you can generate here: https://cloud.synpse.net/service-accounts.
+
+Alternatively, use [Personal Access Keys](https://cloud.synpse.net/access-keys), however, they will be able to manage multiple projects.
