@@ -15,7 +15,7 @@ import (
 )
 
 // CreateApplication creates a new application in the specified namespace.
-// Applications documentation can be found here: https://docs.synpse.net/synpse-core/applications
+// Applications API ref: https://docs.synpse.net/synpse-core/applications
 func (api *API) CreateApplication(ctx context.Context, namespace string, application Application) (*Application, error) {
 	if namespace == "" {
 		return nil, fmt.Errorf("namespace not selected")

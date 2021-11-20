@@ -28,7 +28,8 @@ const (
 
 // Errors
 var (
-	ErrEmptyCredentials = errors.New("invalid credentials: access key must not be empty")
+	ErrEmptyCredentials      = errors.New("invalid credentials: access key must not be empty")
+	ErrNamespaceNotSpecified = errors.New("namespace not specified")
 )
 
 // Error messages
