@@ -2,6 +2,7 @@ package synpse
 
 import (
 	"context"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -9,6 +10,10 @@ import (
 )
 
 func TestListProjects(t *testing.T) {
+	if os.Getenv(EnvSynpsePersonalAccessKey) == "" {
+		t.Skip("Skipping test due to missing personal access key")
+	}
+
 	client := getTestingPersonalClient(t)
 
 	projects, err := client.ListProjects(context.Background())
