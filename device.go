@@ -12,80 +12,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-type Device struct {
-	ID        string    `json:"id" yaml:"id"`
-	CreatedAt time.Time `json:"createdAt" yaml:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt" yaml:"updatedAt"`
-	ProjectID string    `json:"projectId" yaml:"projectId"`
-
-	Name                 string            `json:"name" yaml:"name"`
-	RegistrationTokenID  string            `json:"registrationTokenId" yaml:"registrationTokenId"`
-	AgentSettings        AgentSettings     `json:"agentSettings" yaml:"agentSettings"`
-	Info                 DeviceInfo        `json:"info" yaml:"info" gorm:"json"`
-	LastSeenAt           time.Time         `json:"lastSeenAt" yaml:"lastSeenAt"`
-	Status               DeviceStatus      `json:"status" yaml:"status"`
-	Labels               map[string]string `json:"labels,omitempty" yaml:"labels,omitempty"`
-	EnvironmentVariables map[string]string `json:"environmentVariables,omitempty" yaml:"environmentVariables,omitempty"`
-
-	Applications []*Application `json:"applications,omitempty" yaml:"applications,omitempty"`
-}
-
-type DeviceStatus string
-
-const (
-	DeviceStatusOnline  = DeviceStatus("online")
-	DeviceStatusOffline = DeviceStatus("offline")
-)
-
-type AgentSettings struct {
-	AgentLogLevel            string `json:"agentLogLevel" yaml:"agentLogLevel"`
-	DesiredAgentVersion      string `json:"desiredAgentVersion" yaml:"desiredAgentVersion"`
-	DesiredAgentVersionForce bool   `json:"-" yaml:"-"` // TODO: Placeholder only so we can wire it in if needed from controller side. If this set to true agent will ignore downgrade checks
-}
-
-type DeviceInfo struct {
-	DeviceID      string     `json:"deviceId" yaml:"deviceId"`
-	AgentVersion  string     `json:"agentVersion" yaml:"agentVersion"`
-	AgentLogLevel string     `json:"agentLogLevel" yaml:"agentLogLevel"`
-	IPAddress     string     `json:"ipAddress" yaml:"ipAddress"`
-	Architecture  string     `json:"architecture" yaml:"architecture"`
-	Hostname      string     `json:"hostname" yaml:"hostname"`
-	OSRelease     OSRelease  `json:"osRelease" yaml:"osRelease"`
-	Docker        DockerInfo `json:"docker" yaml:"docker"`
-
-	CPUInfo CPUInfo `json:"cpuInfo" yaml:"cpuInfo"`
-}
-
-type CPUInfo struct {
-	BrandName      string `json:"brandName" yaml:"brandName"`           // Brand name reported by the CPU
-	VendorString   string `json:"vendorString" yaml:"vendorString"`     // Raw vendor string.
-	PhysicalCores  int    `json:"physicalCores" yaml:"physicalCores"`   // Number of physical processor cores in your CPU. Will be 0 if undetectable.
-	ThreadsPerCore int    `json:"threadsPerCore" yaml:"threadsPerCore"` // Number of threads per physical core. Will be 1 if undetectable.
-	LogicalCores   int    `json:"logicalCores" yaml:"logicalCores"`     // Number of physical cores times threads that can run on each core through the use of hyperthreading. Will be 0 if undetectable.
-	Family         int    `json:"family" yaml:"family"`                 // CPU family number
-	Model          int    `json:"model" yaml:"model"`                   // CPU model number
-	Hz             int64  `json:"hz" yaml:"hz"`                         // Clock speed, if known, 0 otherwise. Will attempt to contain base clock speed.
-}
-
-type DockerInfo struct {
-	Version           string `json:"version" yaml:"version"`
-	PrivilegedEnabled bool   `json:"privilegedEnabled" yaml:"privilegedEnabled"`
-	BridgeIP          string `json:"bridgeIP" yaml:"bridgeIP"`
-	Runtimes          string `json:"runtimes" yaml:"runtimes"`
-	OSType            string `json:"osType" yaml:"osType"`
-	Health            string `json:"health" yaml:"health"`
-	HealthDescription string `json:"healthDescription" yaml:"healthDescription"`
-}
-
-type OSRelease struct {
-	PrettyName string `json:"prettyName" yaml:"prettyName"`
-	Name       string `json:"name" yaml:"name"`
-	VersionID  string `json:"versionId" yaml:"versionId"`
-	Version    string `json:"version" yaml:"version"`
-	ID         string `json:"id" yaml:"id"`
-	IDLike     string `json:"idLike" yaml:"idLike"`
-}
-
 func (api *API) ListDevices(ctx context.Context, filters []string) ([]*Device, error) {
 	// construct filter query
 	f := ""
@@ -186,4 +112,78 @@ func (api *API) DeviceConnect(ctx context.Context, deviceID, port, hostname stri
 func (api *API) DeviceReboot(ctx context.Context, deviceID string) error {
 	_, err := api.makeRequestContext(ctx, http.MethodPost, getURL(projectsURL, api.ProjectID, devicesURL, deviceID, rebootURL), []byte{})
 	return err
+}
+
+type Device struct {
+	ID        string    `json:"id" yaml:"id"`
+	CreatedAt time.Time `json:"createdAt" yaml:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt" yaml:"updatedAt"`
+	ProjectID string    `json:"projectId" yaml:"projectId"`
+
+	Name                 string            `json:"name" yaml:"name"`
+	RegistrationTokenID  string            `json:"registrationTokenId" yaml:"registrationTokenId"`
+	AgentSettings        AgentSettings     `json:"agentSettings" yaml:"agentSettings"`
+	Info                 DeviceInfo        `json:"info" yaml:"info" gorm:"json"`
+	LastSeenAt           time.Time         `json:"lastSeenAt" yaml:"lastSeenAt"`
+	Status               DeviceStatus      `json:"status" yaml:"status"`
+	Labels               map[string]string `json:"labels,omitempty" yaml:"labels,omitempty"`
+	EnvironmentVariables map[string]string `json:"environmentVariables,omitempty" yaml:"environmentVariables,omitempty"`
+
+	Applications []*Application `json:"applications,omitempty" yaml:"applications,omitempty"`
+}
+
+type DeviceStatus string
+
+const (
+	DeviceStatusOnline  = DeviceStatus("online")
+	DeviceStatusOffline = DeviceStatus("offline")
+)
+
+type AgentSettings struct {
+	AgentLogLevel            string `json:"agentLogLevel" yaml:"agentLogLevel"`
+	DesiredAgentVersion      string `json:"desiredAgentVersion" yaml:"desiredAgentVersion"`
+	DesiredAgentVersionForce bool   `json:"-" yaml:"-"` // TODO: Placeholder only so we can wire it in if needed from controller side. If this set to true agent will ignore downgrade checks
+}
+
+type DeviceInfo struct {
+	DeviceID      string     `json:"deviceId" yaml:"deviceId"`
+	AgentVersion  string     `json:"agentVersion" yaml:"agentVersion"`
+	AgentLogLevel string     `json:"agentLogLevel" yaml:"agentLogLevel"`
+	IPAddress     string     `json:"ipAddress" yaml:"ipAddress"`
+	Architecture  string     `json:"architecture" yaml:"architecture"`
+	Hostname      string     `json:"hostname" yaml:"hostname"`
+	OSRelease     OSRelease  `json:"osRelease" yaml:"osRelease"`
+	Docker        DockerInfo `json:"docker" yaml:"docker"`
+
+	CPUInfo CPUInfo `json:"cpuInfo" yaml:"cpuInfo"`
+}
+
+type CPUInfo struct {
+	BrandName      string `json:"brandName" yaml:"brandName"`           // Brand name reported by the CPU
+	VendorString   string `json:"vendorString" yaml:"vendorString"`     // Raw vendor string.
+	PhysicalCores  int    `json:"physicalCores" yaml:"physicalCores"`   // Number of physical processor cores in your CPU. Will be 0 if undetectable.
+	ThreadsPerCore int    `json:"threadsPerCore" yaml:"threadsPerCore"` // Number of threads per physical core. Will be 1 if undetectable.
+	LogicalCores   int    `json:"logicalCores" yaml:"logicalCores"`     // Number of physical cores times threads that can run on each core through the use of hyperthreading. Will be 0 if undetectable.
+	Family         int    `json:"family" yaml:"family"`                 // CPU family number
+	Model          int    `json:"model" yaml:"model"`                   // CPU model number
+	Hz             int64  `json:"hz" yaml:"hz"`                         // Clock speed, if known, 0 otherwise. Will attempt to contain base clock speed.
+}
+
+type DockerInfo struct {
+	Version           string `json:"version" yaml:"version"`
+	PrivilegedEnabled bool   `json:"privilegedEnabled" yaml:"privilegedEnabled"`
+	BridgeIP          string `json:"bridgeIP" yaml:"bridgeIP"`
+	Runtimes          string `json:"runtimes" yaml:"runtimes"`
+	OSType            string `json:"osType" yaml:"osType"`
+	Health            string `json:"health" yaml:"health"`
+	HealthDescription string `json:"healthDescription" yaml:"healthDescription"`
+}
+
+type OSRelease struct {
+	PrettyName string `json:"prettyName" yaml:"prettyName"`
+	Name       string `json:"name" yaml:"name"`
+	VersionID  string `json:"versionId" yaml:"versionId"`
+	Version    string `json:"version" yaml:"version"`
+	ID         string `json:"id" yaml:"id"`
+	IDLike     string `json:"idLike" yaml:"idLike"`
 }

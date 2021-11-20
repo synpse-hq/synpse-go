@@ -9,6 +9,20 @@ import (
 	"github.com/pkg/errors"
 )
 
+func (api *API) GetDefaultDeviceRegistrationToken(ctx context.Context, project string) (*DeviceRegistrationToken, error) {
+	resp, err := api.makeRequestContext(ctx, http.MethodGet, getURL(api.BaseURL, projectsURL, api.ProjectID, deviceRegistrationTokenURL), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var result DeviceRegistrationToken
+	err = json.Unmarshal(resp, &result)
+	if err != nil {
+		return nil, errors.Wrap(err, errUnmarshalError)
+	}
+	return &result, nil
+}
+
 type DeviceRegistrationToken struct {
 	ID                   string               `json:"id" yaml:"id"`
 	CreatedAt            time.Time            `json:"createdAt" yaml:"createdAt"`
@@ -34,17 +48,3 @@ const (
 	DeviceNamingStrategyTypeDefault      DeviceNamingStrategyType = "default"
 	DeviceNamingStrategyTypeFromHostname DeviceNamingStrategyType = "fromHostname"
 )
-
-func (api *API) GetDefaultDeviceRegistrationToken(ctx context.Context, project string) (*DeviceRegistrationToken, error) {
-	resp, err := api.makeRequestContext(ctx, http.MethodGet, getURL(api.BaseURL, projectsURL, api.ProjectID, deviceRegistrationTokenURL), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	var result DeviceRegistrationToken
-	err = json.Unmarshal(resp, &result)
-	if err != nil {
-		return nil, errors.Wrap(err, errUnmarshalError)
-	}
-	return &result, nil
-}
