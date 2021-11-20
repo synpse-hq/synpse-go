@@ -33,6 +33,19 @@ func (api *API) CreateApplication(ctx context.Context, namespace string, applica
 	return &result, nil
 }
 
+func (api *API) DeleteApplication(ctx context.Context, namespace, name string) error {
+	if namespace == "" {
+		return fmt.Errorf("namespace not selected")
+	}
+
+	_, err := api.makeRequestContext(ctx, http.MethodDelete, getURL(api.BaseURL, projectsURL, api.ProjectID, namespacesURL, namespace, applicationsURL, name), nil)
+	if err != nil {
+		return err
+	}
+
+	return err
+}
+
 func (api *API) ListApplications(ctx context.Context, namespace string) ([]*Application, error) {
 	if namespace == "" {
 		return nil, fmt.Errorf("namespace not selected")
