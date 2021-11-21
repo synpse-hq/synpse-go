@@ -38,7 +38,7 @@ func (api *API) ListDevices(ctx context.Context, filters []string) ([]*Device, e
 }
 
 func (api *API) GetDevice(ctx context.Context, device string) (*Device, error) {
-	resp, err := api.makeRequestContext(ctx, http.MethodGet, getURL(projectsURL, api.ProjectID, devicesURL, device+"?full"), nil)
+	resp, err := api.makeRequestContext(ctx, http.MethodGet, getURL(api.BaseURL, projectsURL, api.ProjectID, devicesURL, device+"?full"), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -52,13 +52,13 @@ func (api *API) GetDevice(ctx context.Context, device string) (*Device, error) {
 }
 
 func (api *API) DeleteDevice(ctx context.Context, project, device string) error {
-	_, err := api.makeRequestContext(ctx, http.MethodDelete, getURL(projectsURL, api.ProjectID, devicesURL, device), nil)
+	_, err := api.makeRequestContext(ctx, http.MethodDelete, getURL(api.BaseURL, projectsURL, api.ProjectID, devicesURL, device), nil)
 	return err
 }
 
 // UpdateDevice can update device name and desired version
 func (api *API) UpdateDevice(ctx context.Context, device Device) (*Device, error) {
-	resp, err := api.makeRequestContext(ctx, http.MethodPatch, getURL(projectsURL, api.ProjectID, devicesURL, device.ID), device)
+	resp, err := api.makeRequestContext(ctx, http.MethodPatch, getURL(api.BaseURL, projectsURL, api.ProjectID, devicesURL, device.ID), device)
 	if err != nil {
 		return nil, err
 	}

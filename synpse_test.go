@@ -8,6 +8,8 @@ import (
 )
 
 const (
+	EnvSynpseAPIEndpointURL = "SYNPSE_API_ENDPOINT_URL"
+
 	EnvSynpsePersonalAccessKey = "SYNPSE_PERSONAL_ACCESS_KEY"
 	EnvSynpseProjectAccessKey  = "SYNPSE_PROJECT_ACCESS_KEY"
 
@@ -34,10 +36,16 @@ func init() {
 // getTestingClient returns a new API client for testing purposes. This
 // client should be using project access keys.
 func getTestingProjectClient(t *testing.T) *API {
+	apiEndpointURL := os.Getenv(EnvSynpseAPIEndpointURL)
 	accessKey := os.Getenv(EnvSynpseProjectAccessKey)
 	projectID := os.Getenv(EnvSynpseSDKTestProjectID)
 
-	apiClient, err := NewWithProject(accessKey, projectID)
+	var opts []Option
+	if apiEndpointURL != "" {
+		opts = append(opts, WithAPIEndpointURL(apiEndpointURL))
+	}
+
+	apiClient, err := NewWithProject(accessKey, projectID, opts...)
 	require.NoError(t, err, "failed to create API client")
 
 	return apiClient
@@ -46,10 +54,16 @@ func getTestingProjectClient(t *testing.T) *API {
 // getTestingPersonalClient returns a new API client for testing purposes. This
 // client should be using personal access keys.
 func getTestingPersonalClient(t *testing.T) *API {
+	apiEndpointURL := os.Getenv(EnvSynpseAPIEndpointURL)
 	accessKey := os.Getenv(EnvSynpsePersonalAccessKey)
 	projectID := os.Getenv(EnvSynpseSDKTestProjectID)
 
-	apiClient, err := NewWithProject(accessKey, projectID)
+	var opts []Option
+	if apiEndpointURL != "" {
+		opts = append(opts, WithAPIEndpointURL(apiEndpointURL))
+	}
+
+	apiClient, err := NewWithProject(accessKey, projectID, opts...)
 	require.NoError(t, err, "failed to create API client")
 
 	return apiClient
