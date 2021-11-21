@@ -8,8 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// const testDeviceName = "testing-device"
-const testDeviceName = "silly-haibt"
+const testDeviceName = "testing-device"
 
 func TestListDevices(t *testing.T) {
 	client := getTestingProjectClient(t)
