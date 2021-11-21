@@ -20,11 +20,13 @@ func main() {
 		panic(err)
 	}
 
+	// List projects
 	projects, err := client.ListProjects(ctx)
 	if err != nil {
 		panic(err)
 	}
 
+	// Print projects
 	for _, p := range projects {
 		fmt.Printf("Project: %s\n", p.Name)
 	}
