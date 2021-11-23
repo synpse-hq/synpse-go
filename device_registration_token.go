@@ -10,7 +10,10 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (api *API) ListDeviceRegistrationTokens(ctx context.Context) ([]*DeviceRegistrationToken, error) {
+type ListDeviceRegistrationTokensRequest struct {
+}
+
+func (api *API) ListDeviceRegistrationTokens(ctx context.Context, req *ListDeviceRegistrationTokensRequest) ([]*DeviceRegistrationToken, error) {
 	resp, err := api.makeRequestContext(ctx, http.MethodGet, getURL(api.BaseURL, projectsURL, api.ProjectID, deviceRegistrationTokenURL), nil)
 	if err != nil {
 		return nil, err
