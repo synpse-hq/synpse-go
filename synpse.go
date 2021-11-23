@@ -223,7 +223,7 @@ func (api *API) makeRequestWithAuthTypeAndHeaders(ctx context.Context, method, u
 		if err != nil {
 			return nil, errors.Wrap(err, "Error caused by request rate limiting")
 		}
-		fmt.Println("URL: ", uri)
+
 		resp, respErr = api.request(ctx, method, uri, reqBody, authType, headers)
 
 		// retry if the server is rate limiting us or if it failed

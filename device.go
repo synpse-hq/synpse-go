@@ -12,15 +12,19 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (api *API) ListDevices(ctx context.Context, filters []string) ([]*Device, error) {
+type ListDevicesRequest struct {
+	Filters []string
+}
+
+func (api *API) ListDevices(ctx context.Context, req *ListDevicesRequest) ([]*Device, error) {
 	// construct filter query
 	f := ""
-	total := len(filters)
+	total := len(req.Filters)
 	if total > 0 {
 		for i := 0; i < total-1; i++ {
-			f = f + filters[i] + "&"
+			f = f + req.Filters[i] + "&"
 		}
-		f = f + filters[total-1]
+		f = f + req.Filters[total-1]
 	}
 
 	resp, err := api.makeRequestContext(ctx, http.MethodGet, getURL(api.BaseURL, projectsURL, api.ProjectID, devicesURL+"?q="+f), nil)

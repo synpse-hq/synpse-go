@@ -13,7 +13,7 @@ const testDeviceName = "testing-device"
 func TestListDevices(t *testing.T) {
 	client := getTestingProjectClient(t)
 
-	devices, err := client.ListDevices(context.Background(), []string{})
+	devices, err := client.ListDevices(context.Background(), &ListDevicesRequest{})
 	require.NoError(t, err)
 
 	assert.True(t, len(devices) > 0)
@@ -22,7 +22,7 @@ func TestListDevices(t *testing.T) {
 func TestDevices(t *testing.T) {
 	client := getTestingProjectClient(t)
 
-	devices, err := client.ListDevices(context.Background(), []string{})
+	devices, err := client.ListDevices(context.Background(), &ListDevicesRequest{})
 	require.NoError(t, err)
 
 	assert.True(t, len(devices) > 0)
