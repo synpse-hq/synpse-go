@@ -27,10 +27,12 @@ func (api *API) CreateProject(ctx context.Context, project Project) (*Project, e
 	return &result, nil
 }
 
+type ListProjectsRequest struct{}
+
 // ListProjects returns a list of projects that the user has access to.
 // Note: this API can only be called with personal access keys (https://cloud.synpse.net/access-keys)
 // and cannot be used when using a Service Account that was created inside the project.
-func (api *API) ListProjects(ctx context.Context) ([]Project, error) {
+func (api *API) ListProjects(ctx context.Context, req *ListProjectsRequest) ([]Project, error) {
 	resp, err := api.makeRequestContext(ctx, http.MethodGet, getURL(api.BaseURL, membershipsURL+"?full"), nil)
 	if err != nil {
 		return nil, err

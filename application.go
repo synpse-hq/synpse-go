@@ -14,6 +14,29 @@ import (
 	"github.com/pkg/errors"
 )
 
+type ListApplicationsRequest struct {
+	Namespace string `json:"namespace"`
+}
+
+func (api *API) ListApplications(ctx context.Context, req *ListApplicationsRequest) ([]*Application, error) {
+	if req.Namespace == "" {
+		return nil, fmt.Errorf("namespace not selected")
+	}
+
+	resp, err := api.makeRequestContext(ctx, http.MethodGet, getURL(api.BaseURL, projectsURL, api.ProjectID, namespacesURL, req.Namespace, applicationsURL), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var applications []*Application
+	err = json.Unmarshal(resp, &applications)
+	if err != nil {
+		return nil, errors.Wrap(err, errUnmarshalError)
+	}
+
+	return applications, nil
+}
+
 // CreateApplication creates a new application in the specified namespace.
 // Applications API ref: https://docs.synpse.net/synpse-core/applications
 func (api *API) CreateApplication(ctx context.Context, namespace string, application Application) (*Application, error) {
@@ -46,25 +69,6 @@ func (api *API) DeleteApplication(ctx context.Context, namespace, name string) e
 	}
 
 	return err
-}
-
-func (api *API) ListApplications(ctx context.Context, namespace string) ([]*Application, error) {
-	if namespace == "" {
-		return nil, fmt.Errorf("namespace not selected")
-	}
-
-	resp, err := api.makeRequestContext(ctx, http.MethodGet, getURL(api.BaseURL, projectsURL, api.ProjectID, namespacesURL, namespace, applicationsURL), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	var applications []*Application
-	err = json.Unmarshal(resp, &applications)
-	if err != nil {
-		return nil, errors.Wrap(err, errUnmarshalError)
-	}
-
-	return applications, nil
 }
 
 // UpdateApplication updates application. This will trigger a version bump on the server side which will redeploy application on

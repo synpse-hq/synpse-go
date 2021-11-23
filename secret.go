@@ -11,6 +11,30 @@ import (
 	"github.com/pkg/errors"
 )
 
+type ListSecretsRequest struct {
+	Namespace string
+}
+
+// ListSecrets lists all secrets in a namespace
+func (api *API) ListSecrets(ctx context.Context, req *ListSecretsRequest) ([]*Secret, error) {
+	if req.Namespace == "" {
+		return nil, ErrNamespaceNotSpecified
+	}
+
+	resp, err := api.makeRequestContext(ctx, http.MethodGet, getURL(api.BaseURL, projectsURL, api.ProjectID, namespacesURL, req.Namespace, secretsURL), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var result []*Secret
+	err = json.Unmarshal(resp, &result)
+	if err != nil {
+		return nil, errors.Wrap(err, errUnmarshalError)
+	}
+
+	return result, nil
+}
+
 // CreateSecret creates a secret in a specified namespace. Secret data will be encoded to base64
 // before sending to the API.
 //
@@ -69,26 +93,6 @@ func (api *API) DeleteSecret(ctx context.Context, namespace, name string) error 
 	}
 
 	return nil
-}
-
-// ListSecrets lists all secrets in a namespace
-func (api *API) ListSecrets(ctx context.Context, namespace string) ([]*Secret, error) {
-	if namespace == "" {
-		return nil, ErrNamespaceNotSpecified
-	}
-
-	resp, err := api.makeRequestContext(ctx, http.MethodGet, getURL(api.BaseURL, projectsURL, api.ProjectID, namespacesURL, namespace, secretsURL), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	var result []*Secret
-	err = json.Unmarshal(resp, &result)
-	if err != nil {
-		return nil, errors.Wrap(err, errUnmarshalError)
-	}
-
-	return result, nil
 }
 
 // UpdateSecret updates a secret data in a specified namespace. Note that secret type cannot be changed.

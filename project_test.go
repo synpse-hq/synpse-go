@@ -16,7 +16,7 @@ func TestListProjects(t *testing.T) {
 
 	client := getTestingPersonalClient(t)
 
-	projects, err := client.ListProjects(context.Background())
+	projects, err := client.ListProjects(context.Background(), &ListProjectsRequest{})
 	require.NoError(t, err)
 
 	assert.True(t, len(projects) > 0)

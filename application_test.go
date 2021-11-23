@@ -13,7 +13,7 @@ const testAppPrefix = "sdk-test-"
 func TestListApplications(t *testing.T) {
 	client := getTestingProjectClient(t)
 
-	applications, err := client.ListApplications(context.Background(), sdkTestNamespace)
+	applications, err := client.ListApplications(context.Background(), &ListApplicationsRequest{Namespace: sdkTestNamespace})
 	require.NoError(t, err)
 
 	applicationFound := false
@@ -53,7 +53,7 @@ func TestCreateApplication(t *testing.T) {
 	t.Logf("created application %s (%s)", application.Name, application.ID)
 
 	t.Run("FindCreatedApplication", func(t *testing.T) {
-		applications, err := client.ListApplications(context.Background(), sdkTestNamespace)
+		applications, err := client.ListApplications(context.Background(), &ListApplicationsRequest{Namespace: sdkTestNamespace})
 		require.NoError(t, err)
 
 		applicationFound := false

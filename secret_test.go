@@ -14,7 +14,7 @@ const testSecretPrefix = "sdk-test-"
 func TestListSecrets(t *testing.T) {
 	client := getTestingProjectClient(t)
 
-	_, err := client.ListSecrets(context.Background(), sdkTestNamespace)
+	_, err := client.ListSecrets(context.Background(), &ListSecretsRequest{Namespace: sdkTestNamespace})
 	require.NoError(t, err, "failed to list secrets")
 }
 
@@ -33,7 +33,7 @@ func TestEnvironmentSecret(t *testing.T) {
 	t.Logf("created secret %s (%s)", environmentSecret.Name, environmentSecret.ID)
 
 	t.Run("FindCreatedSecret", func(t *testing.T) {
-		secrets, err := client.ListSecrets(context.Background(), sdkTestNamespace)
+		secrets, err := client.ListSecrets(context.Background(), &ListSecretsRequest{Namespace: sdkTestNamespace})
 		require.NoError(t, err)
 
 		secretFound := false
