@@ -13,7 +13,7 @@ import (
 // Note: this API can only be called with personal access keys (https://cloud.synpse.net/access-keys)
 // and cannot be used when using a Service Account that was created inside the projec
 func (api *API) CreateProject(ctx context.Context, project Project) (*Project, error) {
-	resp, err := api.makeRequestContext(ctx, http.MethodPost, getURL(api.BaseURL, projectsURL), project)
+	resp, _, err := api.makeRequestContext(ctx, http.MethodPost, getURL(api.BaseURL, projectsURL), project)
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +33,7 @@ type ListProjectsRequest struct{}
 // Note: this API can only be called with personal access keys (https://cloud.synpse.net/access-keys)
 // and cannot be used when using a Service Account that was created inside the project.
 func (api *API) ListProjects(ctx context.Context, req *ListProjectsRequest) ([]Project, error) {
-	resp, err := api.makeRequestContext(ctx, http.MethodGet, getURL(api.BaseURL, membershipsURL+"?full"), nil)
+	resp, _, err := api.makeRequestContext(ctx, http.MethodGet, getURL(api.BaseURL, membershipsURL+"?full"), nil)
 	if err != nil {
 		return nil, err
 	}

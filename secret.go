@@ -21,7 +21,7 @@ func (api *API) ListSecrets(ctx context.Context, req *ListSecretsRequest) ([]*Se
 		return nil, ErrNamespaceNotSpecified
 	}
 
-	resp, err := api.makeRequestContext(ctx, http.MethodGet, getURL(api.BaseURL, projectsURL, api.ProjectID, namespacesURL, req.Namespace, secretsURL), nil)
+	resp, _, err := api.makeRequestContext(ctx, http.MethodGet, getURL(api.BaseURL, projectsURL, api.ProjectID, namespacesURL, req.Namespace, secretsURL), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +49,7 @@ func (api *API) CreateSecret(ctx context.Context, namespace string, secret Secre
 		return nil, fmt.Errorf("failed to encode secret payload: %w", err)
 	}
 
-	resp, err := api.makeRequestContext(ctx, http.MethodPost, getURL(api.BaseURL, projectsURL, api.ProjectID, namespacesURL, namespace, secretsURL), secret)
+	resp, _, err := api.makeRequestContext(ctx, http.MethodPost, getURL(api.BaseURL, projectsURL, api.ProjectID, namespacesURL, namespace, secretsURL), secret)
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +87,7 @@ func (api *API) DeleteSecret(ctx context.Context, namespace, name string) error 
 		return fmt.Errorf("secret name or ID not specified")
 	}
 
-	_, err := api.makeRequestContext(ctx, http.MethodDelete, getURL(api.BaseURL, projectsURL, api.ProjectID, namespacesURL, namespace, secretsURL, name), nil)
+	_, _, err := api.makeRequestContext(ctx, http.MethodDelete, getURL(api.BaseURL, projectsURL, api.ProjectID, namespacesURL, namespace, secretsURL, name), nil)
 	if err != nil {
 		return err
 	}
@@ -110,7 +110,7 @@ func (api *API) UpdateSecret(ctx context.Context, namespace string, p Secret) (*
 		return nil, fmt.Errorf("failed to encode secret payload: %w", err)
 	}
 
-	resp, err := api.makeRequestContext(ctx, http.MethodPatch, getURL(api.BaseURL, projectsURL, api.ProjectID, namespacesURL, namespace, secretsURL, p.Name), p)
+	resp, _, err := api.makeRequestContext(ctx, http.MethodPatch, getURL(api.BaseURL, projectsURL, api.ProjectID, namespacesURL, namespace, secretsURL, p.Name), p)
 	if err != nil {
 		return nil, err
 	}
@@ -134,7 +134,7 @@ func (api *API) GetSecret(ctx context.Context, namespace, name string) (*Secret,
 		return nil, fmt.Errorf("secret name not specified")
 	}
 
-	resp, err := api.makeRequestContext(ctx, http.MethodGet, getURL(api.BaseURL, projectsURL, api.ProjectID, namespacesURL, namespace, secretsURL, name), nil)
+	resp, _, err := api.makeRequestContext(ctx, http.MethodGet, getURL(api.BaseURL, projectsURL, api.ProjectID, namespacesURL, namespace, secretsURL, name), nil)
 	if err != nil {
 		return nil, err
 	}

@@ -23,7 +23,7 @@ func (api *API) ListApplications(ctx context.Context, req *ListApplicationsReque
 		return nil, fmt.Errorf("namespace not selected")
 	}
 
-	resp, err := api.makeRequestContext(ctx, http.MethodGet, getURL(api.BaseURL, projectsURL, api.ProjectID, namespacesURL, req.Namespace, applicationsURL), nil)
+	resp, _, err := api.makeRequestContext(ctx, http.MethodGet, getURL(api.BaseURL, projectsURL, api.ProjectID, namespacesURL, req.Namespace, applicationsURL), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +44,7 @@ func (api *API) CreateApplication(ctx context.Context, namespace string, applica
 		return nil, fmt.Errorf("namespace not selected")
 	}
 
-	resp, err := api.makeRequestContext(ctx, http.MethodPost, getURL(api.BaseURL, projectsURL, api.ProjectID, namespacesURL, namespace, applicationsURL), application)
+	resp, _, err := api.makeRequestContext(ctx, http.MethodPost, getURL(api.BaseURL, projectsURL, api.ProjectID, namespacesURL, namespace, applicationsURL), application)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func (api *API) DeleteApplication(ctx context.Context, namespace, name string) e
 		return fmt.Errorf("namespace not selected")
 	}
 
-	_, err := api.makeRequestContext(ctx, http.MethodDelete, getURL(api.BaseURL, projectsURL, api.ProjectID, namespacesURL, namespace, applicationsURL, name), nil)
+	_, _, err := api.makeRequestContext(ctx, http.MethodDelete, getURL(api.BaseURL, projectsURL, api.ProjectID, namespacesURL, namespace, applicationsURL, name), nil)
 	if err != nil {
 		return err
 	}
@@ -78,7 +78,7 @@ func (api *API) UpdateApplication(ctx context.Context, namespace string, p Appli
 		return nil, fmt.Errorf("namespace not selected")
 	}
 
-	resp, err := api.makeRequestContext(ctx, http.MethodPatch, getURL(api.BaseURL, projectsURL, api.ProjectID, namespacesURL, namespace, applicationsURL, p.Name), p)
+	resp, _, err := api.makeRequestContext(ctx, http.MethodPatch, getURL(api.BaseURL, projectsURL, api.ProjectID, namespacesURL, namespace, applicationsURL, p.Name), p)
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +98,7 @@ func (api *API) GetApplication(ctx context.Context, namespace, name string) (*Ap
 		return nil, fmt.Errorf("namespace not selected")
 	}
 
-	resp, err := api.makeRequestContext(ctx, http.MethodGet, getURL(api.BaseURL, projectsURL, api.ProjectID, namespacesURL, namespace, applicationsURL, name), nil)
+	resp, _, err := api.makeRequestContext(ctx, http.MethodGet, getURL(api.BaseURL, projectsURL, api.ProjectID, namespacesURL, namespace, applicationsURL, name), nil)
 	if err != nil {
 		return nil, err
 	}

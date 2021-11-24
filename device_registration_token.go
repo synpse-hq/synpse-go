@@ -14,7 +14,7 @@ type ListDeviceRegistrationTokensRequest struct {
 }
 
 func (api *API) ListDeviceRegistrationTokens(ctx context.Context, req *ListDeviceRegistrationTokensRequest) ([]*DeviceRegistrationToken, error) {
-	resp, err := api.makeRequestContext(ctx, http.MethodGet, getURL(api.BaseURL, projectsURL, api.ProjectID, deviceRegistrationTokenURL), nil)
+	resp, _, err := api.makeRequestContext(ctx, http.MethodGet, getURL(api.BaseURL, projectsURL, api.ProjectID, deviceRegistrationTokenURL), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +29,7 @@ func (api *API) ListDeviceRegistrationTokens(ctx context.Context, req *ListDevic
 }
 
 func (api *API) CreateRegistrationToken(ctx context.Context, registrationToken DeviceRegistrationToken) (*DeviceRegistrationToken, error) {
-	resp, err := api.makeRequestContext(ctx, http.MethodPost, getURL(api.BaseURL, projectsURL, api.ProjectID, deviceRegistrationTokenURL), registrationToken)
+	resp, _, err := api.makeRequestContext(ctx, http.MethodPost, getURL(api.BaseURL, projectsURL, api.ProjectID, deviceRegistrationTokenURL), registrationToken)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +47,7 @@ func (api *API) UpdateRegistrationToken(ctx context.Context, registrationToken D
 	if registrationToken.ID == "" {
 		return nil, fmt.Errorf("registration token ID not specified")
 	}
-	resp, err := api.makeRequestContext(ctx, http.MethodPut, getURL(api.BaseURL, projectsURL, api.ProjectID, deviceRegistrationTokenURL, registrationToken.ID), registrationToken)
+	resp, _, err := api.makeRequestContext(ctx, http.MethodPut, getURL(api.BaseURL, projectsURL, api.ProjectID, deviceRegistrationTokenURL, registrationToken.ID), registrationToken)
 	if err != nil {
 		return nil, err
 	}
@@ -65,12 +65,12 @@ func (api *API) DeleteRegistrationToken(ctx context.Context, registrationToken s
 	if registrationToken == "" {
 		return fmt.Errorf("registration token ID not specified")
 	}
-	_, err := api.makeRequestContext(ctx, http.MethodDelete, getURL(api.BaseURL, projectsURL, api.ProjectID, deviceRegistrationTokenURL, registrationToken), nil)
+	_, _, err := api.makeRequestContext(ctx, http.MethodDelete, getURL(api.BaseURL, projectsURL, api.ProjectID, deviceRegistrationTokenURL, registrationToken), nil)
 	return err
 }
 
 func (api *API) GetDefaultDeviceRegistrationToken(ctx context.Context, project string) (*DeviceRegistrationToken, error) {
-	resp, err := api.makeRequestContext(ctx, http.MethodGet, getURL(api.BaseURL, projectsURL, api.ProjectID, deviceRegistrationTokenURL), nil)
+	resp, _, err := api.makeRequestContext(ctx, http.MethodGet, getURL(api.BaseURL, projectsURL, api.ProjectID, deviceRegistrationTokenURL), nil)
 	if err != nil {
 		return nil, err
 	}

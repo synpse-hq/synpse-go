@@ -3,8 +3,10 @@ package synpse
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/function61/holepunch-server/pkg/wsconnadapter"
@@ -13,21 +15,45 @@ import (
 )
 
 type ListDevicesRequest struct {
-	Filters []string
+	SearchQuery       string            // Search query, e.g. "power-plant-one"
+	Labels            map[string]string // A map of labels to match
+	PaginationOptions PaginationOptions
 }
 
-func (api *API) ListDevices(ctx context.Context, req *ListDevicesRequest) ([]*Device, error) {
-	// construct filter query
-	f := ""
-	total := len(req.Filters)
-	if total > 0 {
-		for i := 0; i < total-1; i++ {
-			f = f + req.Filters[i] + "&"
-		}
-		f = f + req.Filters[total-1]
+type ListDevicesResponse struct {
+	Devices    []*Device
+	Pagination Pagination
+}
+
+func (api *API) ListDevices(ctx context.Context, req *ListDevicesRequest) (*ListDevicesResponse, error) {
+	apiURL := getURL(api.BaseURL, projectsURL, api.ProjectID, devicesURL)
+
+	u, err := url.Parse(apiURL)
+	if err != nil {
+		return nil, fmt.Errorf("failed to prepare URL '%s', error: %w", apiURL, err)
 	}
 
-	resp, err := api.makeRequestContext(ctx, http.MethodGet, getURL(api.BaseURL, projectsURL, api.ProjectID, devicesURL+"?q="+f), nil)
+	q := u.Query()
+
+	if req.SearchQuery != "" {
+		q.Add("q", req.SearchQuery)
+	}
+
+	if len(req.Labels) > 0 {
+		bts, err := json.Marshal(req.Labels)
+		if err != nil {
+			return nil, fmt.Errorf("failed to encode labels, error: %w", err)
+		}
+		q.Add("labels", string(bts))
+	}
+
+	// Setting pagination
+	setPagination(q, &req.PaginationOptions)
+
+	u.RawQuery = q.Encode()
+
+	// resp, err := api.makeRequestContext(ctx, http.MethodGet, getURL(api.BaseURL, projectsURL, api.ProjectID, devicesURL+"?q="+f), nil)
+	resp, respHeader, err := api.makeRequestContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -38,11 +64,14 @@ func (api *API) ListDevices(ctx context.Context, req *ListDevicesRequest) ([]*De
 		return nil, errors.Wrap(err, errUnmarshalError)
 	}
 
-	return result, nil
+	return &ListDevicesResponse{
+		Devices:    result,
+		Pagination: getPagination(respHeader),
+	}, nil
 }
 
 func (api *API) GetDevice(ctx context.Context, device string) (*Device, error) {
-	resp, err := api.makeRequestContext(ctx, http.MethodGet, getURL(api.BaseURL, projectsURL, api.ProjectID, devicesURL, device+"?full"), nil)
+	resp, _, err := api.makeRequestContext(ctx, http.MethodGet, getURL(api.BaseURL, projectsURL, api.ProjectID, devicesURL, device+"?full"), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -56,13 +85,13 @@ func (api *API) GetDevice(ctx context.Context, device string) (*Device, error) {
 }
 
 func (api *API) DeleteDevice(ctx context.Context, project, device string) error {
-	_, err := api.makeRequestContext(ctx, http.MethodDelete, getURL(api.BaseURL, projectsURL, api.ProjectID, devicesURL, device), nil)
+	_, _, err := api.makeRequestContext(ctx, http.MethodDelete, getURL(api.BaseURL, projectsURL, api.ProjectID, devicesURL, device), nil)
 	return err
 }
 
 // UpdateDevice can update device name and desired version
 func (api *API) UpdateDevice(ctx context.Context, device Device) (*Device, error) {
-	resp, err := api.makeRequestContext(ctx, http.MethodPatch, getURL(api.BaseURL, projectsURL, api.ProjectID, devicesURL, device.ID), device)
+	resp, _, err := api.makeRequestContext(ctx, http.MethodPatch, getURL(api.BaseURL, projectsURL, api.ProjectID, devicesURL, device.ID), device)
 	if err != nil {
 		return nil, err
 	}
@@ -114,7 +143,7 @@ func (api *API) DeviceConnect(ctx context.Context, deviceID, port, hostname stri
 }
 
 func (api *API) DeviceReboot(ctx context.Context, deviceID string) error {
-	_, err := api.makeRequestContext(ctx, http.MethodPost, getURL(projectsURL, api.ProjectID, devicesURL, deviceID, rebootURL), []byte{})
+	_, _, err := api.makeRequestContext(ctx, http.MethodPost, getURL(projectsURL, api.ProjectID, devicesURL, deviceID, rebootURL), []byte{})
 	return err
 }
 

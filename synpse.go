@@ -168,15 +168,15 @@ type Logger interface {
 
 // makeRequest makes a HTTP request and returns the body as a byte slice,
 // closing it before returning. params will be serialized to JSON.
-func (api *API) makeRequestContext(ctx context.Context, method, uri string, params interface{}) ([]byte, error) {
+func (api *API) makeRequestContext(ctx context.Context, method, uri string, params interface{}) ([]byte, http.Header, error) {
 	return api.makeRequestWithAuthType(ctx, method, uri, params, api.authType)
 }
 
-func (api *API) makeRequestWithAuthType(ctx context.Context, method, uri string, params interface{}, authType int) ([]byte, error) {
+func (api *API) makeRequestWithAuthType(ctx context.Context, method, uri string, params interface{}, authType int) ([]byte, http.Header, error) {
 	return api.makeRequestWithAuthTypeAndHeaders(ctx, method, uri, params, authType, nil)
 }
 
-func (api *API) makeRequestWithAuthTypeAndHeaders(ctx context.Context, method, uri string, params interface{}, authType int, headers http.Header) ([]byte, error) {
+func (api *API) makeRequestWithAuthTypeAndHeaders(ctx context.Context, method, uri string, params interface{}, authType int, headers http.Header) ([]byte, http.Header, error) {
 	// Replace nil with a JSON object if needed
 	var jsonBody []byte
 	var err error
@@ -187,7 +187,7 @@ func (api *API) makeRequestWithAuthTypeAndHeaders(ctx context.Context, method, u
 		} else {
 			jsonBody, err = json.Marshal(params)
 			if err != nil {
-				return nil, errors.Wrap(err, "error marshalling params to JSON")
+				return nil, nil, errors.Wrap(err, "error marshalling params to JSON")
 			}
 		}
 	} else {
@@ -221,7 +221,7 @@ func (api *API) makeRequestWithAuthTypeAndHeaders(ctx context.Context, method, u
 		}
 		err = api.rateLimiter.Wait(context.TODO())
 		if err != nil {
-			return nil, errors.Wrap(err, "Error caused by request rate limiting")
+			return nil, nil, errors.Wrap(err, "Error caused by request rate limiting")
 		}
 
 		resp, respErr = api.request(ctx, method, uri, reqBody, authType, headers)
@@ -247,43 +247,43 @@ func (api *API) makeRequestWithAuthTypeAndHeaders(ctx context.Context, method, u
 			respBody, err = ioutil.ReadAll(resp.Body)
 			defer resp.Body.Close()
 			if err != nil {
-				return nil, errors.Wrap(err, "could not read response body")
+				return nil, resp.Header, errors.Wrap(err, "could not read response body")
 			}
 			break
 		}
 	}
 	if respErr != nil {
-		return nil, respErr
+		return nil, resp.Header, respErr
 	}
 
 	switch {
 	case resp.StatusCode >= http.StatusOK && resp.StatusCode < http.StatusMultipleChoices:
 	case resp.StatusCode == http.StatusUnauthorized:
-		return nil, errors.Errorf("HTTP status %d: invalid credentials", resp.StatusCode)
+		return nil, resp.Header, errors.Errorf("HTTP status %d: invalid credentials", resp.StatusCode)
 	case resp.StatusCode == http.StatusForbidden:
-		return nil, errors.Errorf("HTTP status %d: insufficient permissions", resp.StatusCode)
+		return nil, resp.Header, errors.Errorf("HTTP status %d: insufficient permissions", resp.StatusCode)
 	case resp.StatusCode == http.StatusPreconditionFailed:
-		return nil, errors.Errorf("HTTP status %d: precondition failed", resp.StatusCode)
+		return nil, resp.Header, errors.Errorf("HTTP status %d: precondition failed", resp.StatusCode)
 	case resp.StatusCode == http.StatusPaymentRequired:
-		return nil, errors.Errorf("HTTP status %d: feature not available for your subscription", resp.StatusCode)
+		return nil, resp.Header, errors.Errorf("HTTP status %d: feature not available for your subscription", resp.StatusCode)
 	case resp.StatusCode == http.StatusServiceUnavailable,
 		resp.StatusCode == http.StatusBadGateway,
 		resp.StatusCode == http.StatusGatewayTimeout,
 		resp.StatusCode == 522,
 		resp.StatusCode == 523,
 		resp.StatusCode == 524:
-		return nil, errors.Errorf("HTTP status %d: service failure", resp.StatusCode)
+		return nil, resp.Header, errors.Errorf("HTTP status %d: service failure", resp.StatusCode)
 	case resp.StatusCode == 400:
-		return nil, errors.Errorf("%s", respBody)
+		return nil, resp.Header, errors.Errorf("%s", respBody)
 	default:
 		var s string
 		if respBody != nil {
 			s = string(respBody)
 		}
-		return nil, errors.Errorf("HTTP status %d: content %q", resp.StatusCode, s)
+		return nil, resp.Header, errors.Errorf("HTTP status %d: content %q", resp.StatusCode, s)
 	}
 
-	return respBody, nil
+	return respBody, resp.Header, nil
 }
 
 // request makes a HTTP request to the given API endpoint, returning the raw

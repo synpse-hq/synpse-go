@@ -13,23 +13,23 @@ const testDeviceName = "testing-device"
 func TestListDevices(t *testing.T) {
 	client := getTestingProjectClient(t)
 
-	devices, err := client.ListDevices(context.Background(), &ListDevicesRequest{})
+	devicesResp, err := client.ListDevices(context.Background(), &ListDevicesRequest{})
 	require.NoError(t, err)
 
-	assert.True(t, len(devices) > 0)
+	assert.True(t, len(devicesResp.Devices) > 0)
 }
 
 func TestDevices(t *testing.T) {
 	client := getTestingProjectClient(t)
 
-	devices, err := client.ListDevices(context.Background(), &ListDevicesRequest{})
+	devicesResp, err := client.ListDevices(context.Background(), &ListDevicesRequest{})
 	require.NoError(t, err)
 
-	assert.True(t, len(devices) > 0)
+	assert.True(t, len(devicesResp.Devices) > 0)
 
 	deviceFound := false
 	var testingDevice *Device
-	for _, device := range devices {
+	for _, device := range devicesResp.Devices {
 		t.Logf("device: '%s'", device.Name)
 		if device.Name == testDeviceName {
 			testingDevice = device
