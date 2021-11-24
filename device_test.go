@@ -43,6 +43,10 @@ func TestDevices(t *testing.T) {
 	})
 	require.NoError(t, err, "failed to create device registration token")
 
+	t.Cleanup(func() {
+		_ = client.DeleteRegistrationToken(ctx, drt.ID)
+	})
+
 	t.Run("RegisterDevice", func(t *testing.T) {
 		registered := registerDevice(t, client, &registerDeviceRequest{
 			DeviceRegistrationTokenID: drt.ID,
@@ -93,6 +97,15 @@ func TestDevices(t *testing.T) {
 		assert.Equal(t, "label", stored.Labels["new"])
 	})
 
+	t.Run("DeleteDevice", func(t *testing.T) {
+
+		err := client.DeleteDevice(context.Background(), testingDevice.Name)
+		require.NoError(t, err, "failed to update device")
+
+		// Getting the device
+		_, err = client.GetDevice(context.Background(), testingDevice.Name)
+		require.Error(t, err, "device should have been deleted")
+	})
 }
 
 func registerDevice(t *testing.T, apiClient *API, deviceReq *registerDeviceRequest) *registerDeviceResponse {

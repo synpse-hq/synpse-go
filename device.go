@@ -84,7 +84,7 @@ func (api *API) GetDevice(ctx context.Context, device string) (*Device, error) {
 	return &d, nil
 }
 
-func (api *API) DeleteDevice(ctx context.Context, project, device string) error {
+func (api *API) DeleteDevice(ctx context.Context, device string) error {
 	_, _, err := api.makeRequestContext(ctx, http.MethodDelete, getURL(api.BaseURL, projectsURL, api.ProjectID, devicesURL, device), nil)
 	return err
 }
