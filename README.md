@@ -173,14 +173,14 @@ To create an application that will run on all devices:
 or only on specific devices, based on label selector:
 
 ```golang
-  // Create an application that will be deployed on devices that have our specified label
-  application, err := apiClient.CreateApplication(context.Background(), "default", synpse.Application{
+	// Create an application that will be deployed on devices that have our specified label
+	application, err := apiClient.CreateApplication(context.Background(), "default", synpse.Application{
 		Name:        "app-name",
 		Scheduling: synpse.Scheduling{
 			Type: synpse.ScheduleTypeConditional,
-      Selector: {
-        	"location": "power-plant",
-      }
+			Selector: {
+				"location": "power-plant",
+			}
 		},
 		Spec: synpse.ApplicationSpec{
 			ContainerSpec: []synpse.ContainerSpec{
@@ -199,15 +199,15 @@ or only on specific devices, based on label selector:
 During the normal lifecycle, you will be updating application many times. For example if you want to update the Docker image or expose additional ports, use the `UpdateApplication` method:
 
 ```golang
-  // Create an application that will be deployed on devices that have our specified label
-  application, err := apiClient.UpdateApplication(context.Background(), "default", synpse.Application{
-    ID:          app.ID,
+	// Create an application that will be deployed on devices that have our specified label
+	application, err := apiClient.UpdateApplication(context.Background(), "default", synpse.Application{
+		ID:          app.ID,
 		Name:        "app-name",
 		Scheduling: synpse.Scheduling{
 			Type: synpse.ScheduleTypeConditional,
-      Selector: {
-        	"location": "power-plant",
-      }
+			Selector: {
+				"location": "power-plant",
+			}
 		},
 		Spec: synpse.ApplicationSpec{
 			ContainerSpec: []synpse.ContainerSpec{
@@ -215,9 +215,9 @@ During the normal lifecycle, you will be updating application many times. For ex
 					Name:  "hello",
 					Image: "quay.io/synpse/hello-synpse-go:new",
 					Ports: []string{
-            "8080:8080",
-            "8888:8888",            
-          },
+						"8080:8080",
+						"8888:8888",            
+					},
 				},
 			},
 		},
@@ -229,13 +229,13 @@ During the normal lifecycle, you will be updating application many times. For ex
 to list applications:
 
 ```golang
-  	applications, err := apiClient.ListApplications(
-      context.Background(), 
-      &synpse.ListApplicationsRequest{Namespace: "default"},
-    )
+		applications, err := apiClient.ListApplications(
+			context.Background(), 
+			&synpse.ListApplicationsRequest{Namespace: "default"},
+		)
 		for _, app := range applications {
-      fmt.Println(app.Name)
-    }
+			fmt.Println(app.Name)
+		}
 ```
 
 ### Delete Applications:
@@ -243,6 +243,6 @@ to list applications:
 You can remove applications by using name or ID:
 
 ```golang
-  err := apiClient.DeleteApplication(context.Background(), "default", "app-name")
+	err := apiClient.DeleteApplication(context.Background(), "default", "app-name")
 ```
 
