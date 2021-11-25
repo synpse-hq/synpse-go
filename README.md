@@ -33,6 +33,7 @@ Synpse provides your device fleet management, application deployment and their c
 - [Authentication](#authentication)
 - [Examples](#examples)
   - [Registering New Devices](#registering-new-devices)
+  - [Creating applications](#creating-applications)
 
 ## Prerequisites
 
@@ -72,7 +73,7 @@ func main() {
   apiClient, _ := NewWithProject(os.Getenv("SYNPSE_PROJECT_ACCESS_KEY"), os.Getenv("SYNPSE_PROJECT_ID"))
   
   // List devices
-  devicesResp, _ := client.ListDevices(context.Background(), &ListDevicesRequest{})
+  devicesResp, _ := apiClient.ListDevices(context.Background(), &ListDevicesRequest{})
 
   // Print device names
   for _, device := range devicesResp.Devices {
@@ -87,7 +88,7 @@ Filtering devices during the query is almost always the preferred solution. You 
 
 ```golang
   // List devices that have this label
-  devicesResp, _ := client.ListDevices(context.Background(), &ListDevicesRequest{
+  devicesResp, _ := apiClient.ListDevices(context.Background(), &ListDevicesRequest{
   	Labels: map[string]string{
 			"group": "one", 
 		},
@@ -106,20 +107,79 @@ When automating your device fleet operations, you will most likely need to creat
   var maxRegistrations = 10
 
   // Create a registration token
-  drt, err := client.CreateRegistrationToken(ctx, DeviceRegistrationToken{
+  drt, _ := apiClient.CreateRegistrationToken(ctx, DeviceRegistrationToken{
 		Name:                 "drt-" + userID,
 		MaxRegistrations:     &maxRegistrations,                 // optional 
 		Labels:               map[string]string{"user": userID}, // optional
 	})
 
-  // Print device registration ID
+  // Print device registration ID. Use this token together with your project ID:
+  // 
+  // curl https://downloads.synpse.net/install.sh | \
+  //   AGENT_PROJECT=<YOUR PROJECT ID> \
+  //   AGENT_REGISTRATION_TOKEN=<YOUR DEVICE REGISTRATION TOKEN> \
+  //   bash
   fmt.Println(drt.ID)
 
   // Once registration token is created, you can use device filtering to find it:
-  devicesResp, _ := client.ListDevices(context.Background(), &ListDevicesRequest{
+  devicesResp, _ := apiClient.ListDevices(context.Background(), &ListDevicesRequest{
   	Labels: map[string]string{
 			"user": userID, 
 		},
   })
 
 ```
+
+### Creating applications
+
+Applications in Synpse can either:
+- Run on all devices in the project
+- Run on devices with matching labels
+
+To create an application that will run on all devices:
+
+```golang
+  // Create an application that will be deployed on all devices
+  application, err := apiClient.CreateApplication(context.Background(), sdkTestNamespace, Application{
+		Name:        applicationName,
+		Description: "test-app",
+		Scheduling: synpse.Scheduling{
+			Type: synpse.ScheduleTypeAllDevices,
+		},
+		Spec: synpse.ApplicationSpec{
+			ContainerSpec: []synpse.ContainerSpec{
+				{
+					Name:  "hello",
+					Image: "quay.io/synpse/hello-synpse-go:latest",
+					Ports: []string{"8080:8080"},
+				},
+			},
+		},
+	})
+```
+
+or only on specific devices, based on label selector:
+
+```golang
+  // Create an application that will be deployed on devices that have our specified label
+  application, err := apiClient.CreateApplication(context.Background(), sdkTestNamespace, Application{
+		Name:        applicationName,
+		Description: "test-app",
+		Scheduling: synpse.Scheduling{
+			Type: synpse.ScheduleTypeConditional,
+      Selector: {
+        	"location": "power-plant",
+      }
+		},
+		Spec: synpse.ApplicationSpec{
+			ContainerSpec: []synpse.ContainerSpec{
+				{
+					Name:  "hello",
+					Image: "quay.io/synpse/hello-synpse-go:latest",
+					Ports: []string{"8080:8080"},
+				},
+			},
+		},
+	})
+```
+
