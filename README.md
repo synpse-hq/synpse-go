@@ -34,13 +34,12 @@ Synpse provides your device fleet management, application deployment and their c
 - [Install](#install)
 - [Authentication](#authentication)
 - [Examples](#examples)
-  - [List Devices](#list-devices)
-  - [Registering New Devices](#registering-new-devices)
-  - [L](#l)
-  - [Create Applications](#create-applications)
-  - [Update Application](#update-application)
-  - [List Applications](#list-applications)
-  - [Delete Applications:](#delete-applications)
+	- [Registering New Devices](#registering-new-devices)
+	- [List Devices](#list-devices)
+	- [Create Applications](#create-applications)
+	- [Update Application](#update-application)
+	- [List Applications](#list-applications)
+	- [Delete Applications:](#delete-applications)
 
 ## Prerequisites
 
@@ -81,31 +80,6 @@ func main() {
 }
 ```
 
-### List Devices
-
-```golang
-  // List devices
-  devicesResp, _ := apiClient.ListDevices(context.Background(), &synpse.ListDevicesRequest{})
-
-  // Print device names
-  for _, device := range devicesResp.Devices {
-    fmt.Println(device.Name)
-  }
-```
-
-Here we list an already registered devices. Default page size is 100, if you have more devices, use pagination options and iterate for as long as you have the next page token.
-
-Filtering devices during the query is almost always the preferred solution. You can filter devices by labels:
-
-```golang
-  // List devices that have this label
-  devicesResp, _ := apiClient.ListDevices(context.Background(), &synpse.ListDevicesRequest{
-  	Labels: map[string]string{
-			"group": "one", 
-		},
-  })
-```
-
 ### Registering New Devices
 
 When automating your device fleet operations, you will most likely need to create and manage [device registration tokens](https://docs.synpse.net/synpse-core/devices/provisioning). These tokens can be created with a set of labels and environment variables which will then be inherited by any device that registers using it.
@@ -141,7 +115,31 @@ When automating your device fleet operations, you will most likely need to creat
 
 ```
 
-### L
+
+### List Devices
+
+```golang
+  // List devices
+  devicesResp, _ := apiClient.ListDevices(context.Background(), &synpse.ListDevicesRequest{})
+
+  // Print device names
+  for _, device := range devicesResp.Devices {
+    fmt.Println(device.Name)
+  }
+```
+
+Here we list an already registered devices. Default page size is 100, if you have more devices, use pagination options and iterate for as long as you have the next page token.
+
+Filtering devices during the query is almost always the preferred solution. You can filter devices by labels:
+
+```golang
+  // List devices that have this label
+  devicesResp, _ := apiClient.ListDevices(context.Background(), &synpse.ListDevicesRequest{
+  	Labels: map[string]string{
+			"group": "one", 
+		},
+  })
+```
 
 ### Create Applications
 
