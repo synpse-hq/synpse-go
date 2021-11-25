@@ -34,7 +34,9 @@ Synpse provides your device fleet management, application deployment and their c
 - [Install](#install)
 - [Authentication](#authentication)
 - [Examples](#examples)
+  - [List Devices](#list-devices)
   - [Registering New Devices](#registering-new-devices)
+  - [L](#l)
   - [Create Applications](#create-applications)
   - [Update Application](#update-application)
   - [List Applications](#list-applications)
@@ -60,7 +62,7 @@ Alternatively, use [Personal Access Keys](https://cloud.synpse.net/access-keys),
 
 ## Examples
 
-Let's start with creating an client API and listing registered devices:
+Let's start with creating an client API:
 
 ```golang
 package main
@@ -75,8 +77,13 @@ import (
 func main() {
   // Create a new API client with a specified access key. You can get your access key
   // from https://cloud.synpse.net/service-accounts
-  apiClient, _ := NewWithProject(os.Getenv("SYNPSE_PROJECT_ACCESS_KEY"), os.Getenv("SYNPSE_PROJECT_ID"))
-  
+  apiClient, _ := NewWithProject(os.Getenv("SYNPSE_PROJECT_ACCESS_KEY"), os.Getenv("SYNPSE_PROJECT_ID"))    
+}
+```
+
+### List Devices
+
+```golang
   // List devices
   devicesResp, _ := apiClient.ListDevices(context.Background(), &synpse.ListDevicesRequest{})
 
@@ -84,7 +91,6 @@ func main() {
   for _, device := range devicesResp.Devices {
     fmt.Println(device.Name)
   }
-}
 ```
 
 Here we list an already registered devices. Default page size is 100, if you have more devices, use pagination options and iterate for as long as you have the next page token.
@@ -134,6 +140,8 @@ When automating your device fleet operations, you will most likely need to creat
   })
 
 ```
+
+### L
 
 ### Create Applications
 
