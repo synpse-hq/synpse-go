@@ -224,6 +224,29 @@ func TestDeviceFilteringAndPagination(t *testing.T) {
 		matchDevicesAndDeviceIDs(t, append(groupOneDeviceIDs, groupTwoDeviceIDs...), devicesResp.Devices)
 	})
 
+	t.Run("ListAndValidateGroupOne", func(t *testing.T) {
+		devicesResp, err := client.ListDevices(context.Background(), &ListDevicesRequest{
+			Labels: map[string]string{
+				"group": groupOneLabelValue,
+			},
+		})
+		require.NoError(t, err)
+		require.Len(t, devicesResp.Devices, devicesPerGroup, "unexpected number of devices")
+
+		matchDevicesAndDeviceIDs(t, groupOneDeviceIDs, devicesResp.Devices)
+	})
+
+	t.Run("ListAndValidateGroupTwo", func(t *testing.T) {
+		devicesResp, err := client.ListDevices(context.Background(), &ListDevicesRequest{
+			Labels: map[string]string{
+				"group": groupTwoLabelValue,
+			},
+		})
+		require.NoError(t, err)
+		require.Len(t, devicesResp.Devices, devicesPerGroup, "unexpected number of devices")
+
+		matchDevicesAndDeviceIDs(t, groupOneDeviceIDs, devicesResp.Devices)
+	})
 }
 
 func matchDevicesAndDeviceIDs(t *testing.T, deviceIDs []string, devices []*Device) {
