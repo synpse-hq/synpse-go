@@ -20,9 +20,16 @@ import (
 	"golang.org/x/time/rate"
 )
 
+//
+// Public constants
+//
+
 const (
-	APIURL                = "https://cloud.synpse.net/api"
-	UserAgent             = "synpse-go/v1"
+	// APIURL is the public cloud API endpoint.
+	APIURL = "https://cloud.synpse.net/api"
+	// UserAgent is the default user agent set on the requests
+	UserAgent = "synpse-go/v1"
+	// ClientClientRequestID is the header key for the client request ID
 	ClientClientRequestID = "synpse-client-request-id"
 )
 
@@ -253,7 +260,7 @@ func (api *API) makeRequestWithAuthTypeAndHeaders(ctx context.Context, method, u
 		}
 	}
 	if respErr != nil {
-		return nil, resp.Header, respErr
+		return nil, nil, respErr
 	}
 
 	switch {

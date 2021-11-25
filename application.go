@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"net"
+	"io"
 	"net/http"
 	"strconv"
 	"time"
@@ -18,6 +18,7 @@ type ListApplicationsRequest struct {
 	Namespace string `json:"namespace"`
 }
 
+// ListApplications lists applications in the specified namespace
 func (api *API) ListApplications(ctx context.Context, req *ListApplicationsRequest) ([]*Application, error) {
 	if req.Namespace == "" {
 		return nil, fmt.Errorf("namespace not selected")
@@ -120,7 +121,8 @@ type LogsOpts struct {
 	Tail      int
 }
 
-func (api *API) DeviceApplicationLogs(ctx context.Context, namespace, applicationID string, opts LogsOpts) (net.Conn, error) {
+// DeviceApplicationLogs returns logs for the specified device and application.
+func (api *API) DeviceApplicationLogs(ctx context.Context, namespace, applicationID string, opts LogsOpts) (io.ReadCloser, error) {
 	if namespace == "" {
 		return nil, fmt.Errorf("namespace not selected")
 	}
