@@ -34,9 +34,9 @@ Synpse provides your device fleet management, application deployment and their c
 - [Install](#install)
 - [Authentication](#authentication)
 - [Examples](#examples)
-	- [Registering New Devices](#registering-new-devices)
+	- [Registering New Device](#registering-new-device)
 	- [List Devices](#list-devices)
-	- [Create Applications](#create-applications)
+	- [Create Application](#create-application)
 	- [Update Application](#update-application)
 	- [List Applications](#list-applications)
 	- [Delete Applications:](#delete-applications)
@@ -80,7 +80,7 @@ func main() {
 }
 ```
 
-### Registering New Devices
+### Registering New Device
 
 When automating your device fleet operations, you will most likely need to create and manage [device registration tokens](https://docs.synpse.net/synpse-core/devices/provisioning). These tokens can be created with a set of labels and environment variables which will then be inherited by any device that registers using it.
 
@@ -93,10 +93,10 @@ When automating your device fleet operations, you will most likely need to creat
 
   // Create a registration token
   drt, _ := apiClient.CreateRegistrationToken(ctx, synpse.DeviceRegistrationToken{
-		Name:                 "drt-" + userID,
-		MaxRegistrations:     &maxRegistrations,                 // optional 
-		Labels:               map[string]string{"user": userID}, // optional
-	})
+    Name:                 "drt-" + userID,
+    MaxRegistrations:     &maxRegistrations,                 // optional 
+    Labels:               map[string]string{"user": userID}, // optional
+  })
 
   // Print device registration ID. Use this token together with your project ID:
   // 
@@ -108,9 +108,9 @@ When automating your device fleet operations, you will most likely need to creat
 
   // Once registration token is created, you can use device filtering to find it:
   devicesResp, _ := apiClient.ListDevices(context.Background(), &synpse.ListDevicesRequest{
-  	Labels: map[string]string{
-			"user": userID, 
-		},
+    Labels: map[string]string{
+      "user": userID, 
+    },
   })
 
 ```
@@ -135,13 +135,13 @@ Filtering devices during the query is almost always the preferred solution. You 
 ```golang
   // List devices that have this label
   devicesResp, _ := apiClient.ListDevices(context.Background(), &synpse.ListDevicesRequest{
-  	Labels: map[string]string{
-			"group": "one", 
-		},
+    Labels: map[string]string{
+      "group": "one", 
+    },
   })
 ```
 
-### Create Applications
+### Create Application
 
 Applications in Synpse can either:
 - Run on all devices in the project
@@ -152,44 +152,44 @@ To create an application that will run on all devices:
 ```golang
   // Create an application in 'default' namespace that will be deployed on all devices
   application, err := apiClient.CreateApplication(context.Background(), "default", synpse.Application{
-		Name:        "app-name",
-		Scheduling: synpse.Scheduling{
-			Type: synpse.ScheduleTypeAllDevices,
-		},
-		Spec: synpse.ApplicationSpec{
-			ContainerSpec: []synpse.ContainerSpec{
-				{
-					Name:  "hello",
-					Image: "quay.io/synpse/hello-synpse-go:latest",
-					Ports: []string{"8080:8080"},
-				},
-			},
-		},
-	})
+    Name:        "app-name",
+    Scheduling: synpse.Scheduling{
+      Type: synpse.ScheduleTypeAllDevices,
+    },
+    Spec: synpse.ApplicationSpec{
+      ContainerSpec: []synpse.ContainerSpec{
+        {
+          Name:  "hello",
+          Image: "quay.io/synpse/hello-synpse-go:latest",
+          Ports: []string{"8080:8080"},
+        },
+      },
+    },
+  })
 ```
 
 or only on specific devices, based on label selector:
 
 ```golang
-	// Create an application that will be deployed on devices that have our specified label
-	application, err := apiClient.CreateApplication(context.Background(), "default", synpse.Application{
-		Name:        "app-name",
-		Scheduling: synpse.Scheduling{
-			Type: synpse.ScheduleTypeConditional,
-			Selector: {
-				"location": "power-plant",
-			}
-		},
-		Spec: synpse.ApplicationSpec{
-			ContainerSpec: []synpse.ContainerSpec{
-				{
-					Name:  "hello",
-					Image: "quay.io/synpse/hello-synpse-go:latest",
-					Ports: []string{"8080:8080"},
-				},
-			},
-		},
-	})
+  // Create an application that will be deployed on devices that have our specified label
+  application, err := apiClient.CreateApplication(context.Background(), "default", synpse.Application{
+    Name:        "app-name",
+    Scheduling: synpse.Scheduling{
+      Type: synpse.ScheduleTypeConditional,
+      Selector: {
+        "location": "power-plant",
+      }
+    },
+    Spec: synpse.ApplicationSpec{
+      ContainerSpec: []synpse.ContainerSpec{
+        {
+          Name:  "hello",
+          Image: "quay.io/synpse/hello-synpse-go:latest",
+          Ports: []string{"8080:8080"},
+        },
+      },
+    },
+  })
 ```
 
 ### Update Application
@@ -197,29 +197,29 @@ or only on specific devices, based on label selector:
 During the normal lifecycle, you will be updating application many times. For example if you want to update the Docker image or expose additional ports, use the `UpdateApplication` method:
 
 ```golang
-	// Create an application that will be deployed on devices that have our specified label
-	application, err := apiClient.UpdateApplication(context.Background(), "default", synpse.Application{
-		ID:          app.ID,
-		Name:        "app-name",
-		Scheduling: synpse.Scheduling{
-			Type: synpse.ScheduleTypeConditional,
-			Selector: {
-				"location": "power-plant",
-			}
-		},
-		Spec: synpse.ApplicationSpec{
-			ContainerSpec: []synpse.ContainerSpec{
-				{
-					Name:  "hello",
-					Image: "quay.io/synpse/hello-synpse-go:new",
-					Ports: []string{
-						"8080:8080",
-						"8888:8888",            
-					},
-				},
-			},
-		},
-	})
+  // Create an application that will be deployed on devices that have our specified label
+  application, err := apiClient.UpdateApplication(context.Background(), "default", synpse.Application{
+    ID:          app.ID,
+    Name:        "app-name",
+    Scheduling: synpse.Scheduling{
+      Type: synpse.ScheduleTypeConditional,
+      Selector: {
+        "location": "power-plant",
+      }
+    },
+    Spec: synpse.ApplicationSpec{
+      ContainerSpec: []synpse.ContainerSpec{
+        {
+          Name:  "hello",
+          Image: "quay.io/synpse/hello-synpse-go:new",
+          Ports: []string{
+            "8080:8080",
+            "8888:8888",            
+          },
+        },
+      },
+    },
+  })
 ```
 
 ### List Applications
@@ -227,13 +227,13 @@ During the normal lifecycle, you will be updating application many times. For ex
 to list applications:
 
 ```golang
-		applications, err := apiClient.ListApplications(
-			context.Background(), 
-			&synpse.ListApplicationsRequest{Namespace: "default"},
-		)
-		for _, app := range applications {
-			fmt.Println(app.Name)
-		}
+    applications, err := apiClient.ListApplications(
+      context.Background(), 
+      &synpse.ListApplicationsRequest{Namespace: "default"},
+    )
+    for _, app := range applications {
+      fmt.Println(app.Name)
+    }
 ```
 
 ### Delete Applications:
@@ -241,6 +241,6 @@ to list applications:
 You can remove applications by using name or ID:
 
 ```golang
-	err := apiClient.DeleteApplication(context.Background(), "default", "app-name")
+  err := apiClient.DeleteApplication(context.Background(), "default", "app-name")
 ```
 
