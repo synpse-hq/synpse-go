@@ -245,7 +245,7 @@ func TestDeviceFilteringAndPagination(t *testing.T) {
 		require.NoError(t, err)
 		require.Len(t, devicesResp.Devices, devicesPerGroup, "unexpected number of devices")
 
-		matchDevicesAndDeviceIDs(t, groupOneDeviceIDs, devicesResp.Devices)
+		matchDevicesAndDeviceIDs(t, groupTwoDeviceIDs, devicesResp.Devices)
 	})
 }
 
