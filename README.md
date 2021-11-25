@@ -77,7 +77,7 @@ import (
 func main() {
   // Create a new API client with a specified access key. You can get your access key
   // from https://cloud.synpse.net/service-accounts
-  apiClient, _ := NewWithProject(os.Getenv("SYNPSE_PROJECT_ACCESS_KEY"), os.Getenv("SYNPSE_PROJECT_ID"))    
+  apiClient, _ := synpse.NewWithProject(os.Getenv("SYNPSE_PROJECT_ACCESS_KEY"), os.Getenv("SYNPSE_PROJECT_ID"))    
 }
 ```
 
