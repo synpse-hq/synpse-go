@@ -98,13 +98,13 @@ When automating your device fleet operations, you will most likely need to creat
     Labels:               map[string]string{"user": userID}, // optional
   })
 
-  // Print device registration ID. Use this token together with your project ID:
+  // Use this token together with your project ID:
   // 
   // curl https://downloads.synpse.net/install.sh | \
-  //   AGENT_PROJECT=<YOUR PROJECT ID> \
-  //   AGENT_REGISTRATION_TOKEN=<YOUR DEVICE REGISTRATION TOKEN> \
+  //   AGENT_PROJECT={{ PROJECT_ID }} \
+  //   AGENT_REGISTRATION_TOKEN={{ DEVICE_REGISTRATION_TOKEN }} \
   //   bash
-  fmt.Println(drt.ID)
+
 
   // Once registration token is created, you can use device filtering to find it:
   devicesResp, _ := apiClient.ListDevices(context.Background(), &synpse.ListDevicesRequest{
@@ -224,7 +224,7 @@ During the normal lifecycle, you will be updating application many times. For ex
 
 ### List Applications
 
-to list applications:
+To list applications:
 
 ```golang
     applications, err := apiClient.ListApplications(
