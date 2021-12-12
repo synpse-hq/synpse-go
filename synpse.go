@@ -41,8 +41,7 @@ var (
 
 // Error messages
 var (
-	errMakeRequestError = "error from makeRequest"
-	errUnmarshalError   = "error while unmarshalling the JSON response"
+	errUnmarshalError = "error while unmarshalling the JSON response"
 )
 
 const (
@@ -336,40 +335,3 @@ func getWebsocketURL(u string, s ...string) string {
 func getURL(baseURL string, s ...string) string {
 	return strings.Join(append([]string{baseURL}, s...), "/")
 }
-
-// WorkloadState used to track current application/job state
-type WorkloadState string
-
-// Available ContainerState values
-const (
-	// StatePending is initial state where healthy applications should be healthy but not yet
-	// running. Retries are returned to this state too
-	StatePending WorkloadState = "pending"
-	// StateCreated is state before starting when container is created but not started yet
-	StateCreated WorkloadState = "created"
-	// StateRunning application is running and runtime is not complaining
-	StateRunning WorkloadState = "running"
-	// StateStopped is the state when runtime reports container to be stopped. This will retry
-	StateStopped WorkloadState = "stopped"
-	// StateDeleting is set when application is scheduled for deletion
-	StateDeleting WorkloadState = "deleting"
-	// StateFailed is terminal state. This will NOT retry
-	StateFailed WorkloadState = "failed"
-	// StateUnknown is the runtime state where we don't know the state. This will retry
-	StateUnknown WorkloadState = "unknown"
-	// StateExited is the runtime state where container exited with terminal code. This will retry
-	StateExited WorkloadState = "exited"
-)
-
-// WorkloadStatus is part of the application/job status
-type WorkloadStatus struct {
-	Name        string            `json:"name" yaml:"name"`
-	State       WorkloadState     `json:"state" yaml:"state"`
-	Message     string            `json:"message" yaml:"message"`
-	Timestamp   time.Time         `json:"timestamp" yaml:"timestamp"`
-	Annotations map[string]string `json:"annotations" yaml:"annotations"`
-	StartedAt   time.Time         `json:"startedAt" yaml:"startedAt"`
-	CompletedAt time.Time         `json:"completedAt" yaml:"completedAt"`
-}
-
-type WorkloadStatuses []WorkloadStatus
