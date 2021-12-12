@@ -41,8 +41,7 @@ var (
 
 // Error messages
 var (
-	errMakeRequestError = "error from makeRequest"
-	errUnmarshalError   = "error while unmarshalling the JSON response"
+	errUnmarshalError = "error while unmarshalling the JSON response"
 )
 
 const (
@@ -51,31 +50,18 @@ const (
 )
 
 const (
-	namespacesURL                = "namespaces"
-	projectsURL                  = "projects"
-	applicationsURL              = "applications"
-	serviceaccountrolebindingURL = "serviceaccountrolebindings"
-	serviceAccountURL            = "serviceaccounts"
-	serviceAccountAccessKeysURL  = "serviceaccountaccesskeys"
-	releasesURL                  = "releases"
-	devicesURL                   = "devices"
-	deviceRegistrationTokenURL   = "device-registration-tokens"
-	rolesURL                     = "roles"
-	sshURL                       = "ssh"
-	connectURL                   = "connect"
-	executeURL                   = "execute"
-	rebootURL                    = "reboot"
-	bundleURL                    = "bundle"
-	metricsURL                   = "metrics"
-	membershipsURL               = "memberships"
-	membershipsrolebindingURL    = "membershiprolebindings"
-	secretsURL                   = "secrets"
-	logsURL                      = "logs"
-	lookupUserURL                = "lookup/user"
-	userURL                      = "auth/user"
-	userSSHKeyUrl                = "user-ssh-keys"
-
-	buildsBaseImagesURL = "builds/images"
+	namespacesURL              = "namespaces"
+	projectsURL                = "projects"
+	applicationsURL            = "applications"
+	jobsURL                    = "jobs"
+	devicesURL                 = "devices"
+	deviceRegistrationTokenURL = "device-registration-tokens"
+	sshURL                     = "ssh"
+	connectURL                 = "connect"
+	rebootURL                  = "reboot"
+	membershipsURL             = "memberships"
+	secretsURL                 = "secrets"
+	logsURL                    = "logs"
 )
 
 // New creates a new Synpse v1 API client.
