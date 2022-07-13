@@ -15,7 +15,7 @@ import (
 )
 
 type ListApplicationsRequest struct {
-	Namespace string `json:"namespace"`
+	Namespace string
 }
 
 // ListApplications lists applications in the specified namespace

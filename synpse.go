@@ -57,6 +57,7 @@ const (
 	namespacesURL              = "namespaces"
 	projectsURL                = "projects"
 	applicationsURL            = "applications"
+	allocationsURL             = "allocations"
 	jobsURL                    = "jobs"
 	devicesURL                 = "devices"
 	deviceRegistrationTokenURL = "device-registration-tokens"
