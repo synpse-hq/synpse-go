@@ -12,6 +12,7 @@ import (
 	"github.com/function61/holepunch-server/pkg/wsconnadapter"
 	"github.com/gorilla/websocket"
 	"github.com/pkg/errors"
+	"golang.org/x/crypto/ssh"
 )
 
 type ListDevicesRequest struct {
@@ -105,7 +106,7 @@ func (api *API) UpdateDevice(ctx context.Context, device Device) (*Device, error
 	return &d, nil
 }
 
-func (api *API) DeviceSSH(ctx context.Context, deviceID string) (net.Conn, error) {
+func (api *API) GetDeviceSSHClient(ctx context.Context, deviceID string) (*ssh.Client, error) {
 	req, err := http.NewRequestWithContext(ctx, "", "", nil)
 	if err != nil {
 		return nil, err
@@ -115,10 +116,89 @@ func (api *API) DeviceSSH(ctx context.Context, deviceID string) (net.Conn, error
 
 	wsConn, _, err := websocket.DefaultDialer.Dial(getWebsocketURL(api.BaseURL, projectsURL, api.ProjectID, devicesURL, deviceID, sshURL), req.Header)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error connecting to the backend: %w", err)
 	}
 
-	return wsconnadapter.New(wsConn), nil
+	deviceConn := wsconnadapter.New(wsConn)
+
+	sshClient, err := api.newSSHClient(ctx, deviceConn)
+	if err != nil {
+		return nil, fmt.Errorf("failed to establish SSH connection, error: %w", err)
+	}
+
+	return sshClient, nil
+}
+
+func (api *API) RunDeviceCommand(ctx context.Context, deviceID, command string) (string, error) {
+	sshClient, err := api.GetDeviceSSHClient(ctx, deviceID)
+	if err != nil {
+		return "", err
+	}
+
+	session, err := sshClient.NewSession()
+	if err != nil {
+		return "", err
+	}
+	defer session.Close()
+
+	out, err := session.CombinedOutput(command)
+	if err != nil {
+		return string(out), fmt.Errorf("SSH command error: %w", err)
+	}
+	return string(out), nil
+}
+
+func (api *API) newSSHClient(ctx context.Context, deviceConn net.Conn) (*ssh.Client, error) {
+	config := &ssh.ClientConfig{
+		Timeout:         time.Second * 5,
+		User:            "",
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+	}
+	config.Auth = []ssh.AuthMethod{}
+
+	c, err := newSSHClientConn(deviceConn, ":0", config)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create SSH client conn: %w", err)
+	}
+
+	go func() {
+		err := sshKeepAlive(ctx, c, deviceConn)
+		if err != nil {
+			api.logger.Printf("Failed to setup SSH client keepalives: %s", err)
+		}
+	}()
+
+	return c, nil
+}
+
+func newSSHClientConn(conn net.Conn, addr string, config *ssh.ClientConfig) (*ssh.Client, error) {
+	c, chans, reqs, err := ssh.NewClientConn(conn, addr, config)
+	if err != nil {
+		return nil, err
+	}
+	return ssh.NewClient(c, chans, reqs), nil
+}
+
+func sshKeepAlive(ctx context.Context, cl *ssh.Client, conn net.Conn) error {
+	const keepAliveInterval = 18 * time.Second
+	t := time.NewTicker(keepAliveInterval)
+	defer t.Stop()
+	for {
+		deadline := time.Now().Add(keepAliveInterval).Add(15 * time.Second)
+		err := conn.SetDeadline(deadline)
+		if err != nil {
+			return errors.Wrap(err, "failed to set deadline")
+		}
+		select {
+		case <-t.C:
+			_, _, err = cl.SendRequest("keepalive@synpse.net", true, nil)
+			if err != nil {
+				return errors.Wrap(err, "failed to send keep alive")
+			}
+		case <-ctx.Done():
+			return nil
+		}
+	}
 }
 
 func (api *API) DeviceConnect(ctx context.Context, deviceID, port, hostname string) (net.Conn, error) {

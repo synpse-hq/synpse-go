@@ -8,5 +8,6 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/segmentio/ksuid v1.0.4
 	github.com/stretchr/testify v1.7.0
+	golang.org/x/crypto v0.0.0-20200323165209-0ec3e9974c59
 	golang.org/x/time v0.0.0-20211116232009-f0f3c7e86c11
 )

@@ -12,6 +12,7 @@ import (
 	"math"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 	"time"
 
@@ -31,6 +32,9 @@ const (
 	UserAgent = "synpse-go/v1"
 	// ClientClientRequestID is the header key for the client request ID
 	ClientClientRequestID = "synpse-client-request-id"
+
+	EnvProjectID = "SYNPSE_PROJECT_ID"
+	EnvAccessKey = "SYNPSE_ACCESS_KEY" // Could be either personal access token or project access key
 )
 
 // Errors
@@ -63,6 +67,22 @@ const (
 	secretsURL                 = "secrets"
 	logsURL                    = "logs"
 )
+
+// NewFromEnv creates a new Synpse v1 API client from environment variables.
+// Ensure that you set SYNPSE_PROJECT_ID and SYNPSE_ACCESS_KEY values.
+func NewFromEnv(opts ...Option) (*API, error) {
+	projectID := os.Getenv(EnvProjectID)
+	if projectID == "" {
+		return nil, fmt.Errorf("%s environment variable must not be empty", EnvProjectID)
+	}
+
+	accessKey := os.Getenv(EnvAccessKey)
+	if accessKey == "" {
+		return nil, fmt.Errorf("%s environment variable must not be empty", EnvAccessKey)
+	}
+
+	return NewWithProject(accessKey, projectID, opts...)
+}
 
 // New creates a new Synpse v1 API client.
 func New(accessKey string, opts ...Option) (*API, error) {
